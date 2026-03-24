@@ -1,16 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react";
 
 export default function Home() {
   return (
-    <section className="relative w-full overflow-hidden bg-black px-4 pt-32 pb-40 text-center md:pt-40 md:pb-52 min-h-175 md:min-h-212.5">
+    <section className="relative min-h-175 w-full overflow-hidden bg-black px-4 pt-32 pb-40 text-center md:min-h-180 md:pt-40 md:pb-52">
       {/* BACKGROUND */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
+      <div className="pointer-events-none absolute inset-0 z-0">
         <ShaderGradientCanvas
           style={{
             width: "100%",
@@ -19,7 +18,7 @@ export default function Home() {
             inset: 0,
           }}
         >
-          <ShaderGradient
+          {/* <ShaderGradient
             animate="on"
             axesHelper="off"
             bgColor1="#000000"
@@ -62,6 +61,48 @@ export default function Home() {
             uTime={0}
             wireframe={false}
             zoomOut={false}
+          /> */}
+
+          <ShaderGradient
+            animate="on"
+            axesHelper="off"
+            brightness={0.3}
+            cAzimuthAngle={170}
+            cDistance={3.9}
+            cPolarAngle={70}
+            cameraZoom={1}
+            color1="#282828"
+            color2="#5b09c4"
+            color3="#00000"
+            destination="onCanvas"
+            embedMode="off"
+            envPreset="city"
+            format="gif"
+            fov={45}
+            frameRate={10}
+            gizmoHelper="hide"
+            grain="off"
+            lightType="3d"
+            pixelDensity={0.1}
+            positionX={0}
+            positionY={0.9}
+            positionZ={-0.3}
+            range="disabled"
+            rangeEnd={40}
+            rangeStart={0}
+            reflection={0.1}
+            rotationX={45}
+            rotationY={0}
+            rotationZ={0}
+            shader="defaults"
+            type="waterPlane"
+            uAmplitude={0}
+            uDensity={1}
+            uFrequency={0}
+            uSpeed={0.1}
+            uStrength={1.9}
+            uTime={0}
+            wireframe={false}
           />
         </ShaderGradientCanvas>
 
@@ -71,7 +112,7 @@ export default function Home() {
 
       {/* MAIN CONTENT */}
       <motion.div
-        className="relative z-10 mx-auto mt-10 flex max-w-3xl flex-col items-center"
+        className="relative z-10 mx-auto mt-15 flex max-w-7xl flex-col items-center"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1, ease: "easeOut" }}
@@ -81,13 +122,13 @@ export default function Home() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
         >
-          <h1 className="font-helvetica mb-10 text-3xl font-bold text-white md:text-8xl">
+          <h1 className="font-helvetica mb-10 text-3xl font-bold text-white md:text-[110px]">
             Clarity <span className="text-[#8c8b8b]">in Chaos</span>
           </h1>
         </motion.div>
 
         <motion.p
-          className="max-w-2xl text-xl font-light text-white"
+          className="max-w-2xl text-[18px]  font-light text-white"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
@@ -97,7 +138,7 @@ export default function Home() {
         </motion.p>
 
         <motion.div
-          className="mt-8 flex justify-center gap-4"
+          className="mt-10 flex justify-center gap-4"
           initial="hidden"
           animate="visible"
           variants={{
@@ -119,14 +160,14 @@ export default function Home() {
               size="lg"
               className="bg-[#5b09c4] text-white hover:bg-[#5b09c4]/80"
             >
-              <Link href="/signup">Get Into Clarity →</Link>
+              <Link href="/signup">Try Meeteller →</Link>
             </Button>
           </motion.div>
         </motion.div>
       </motion.div>
 
       {/* FLOATING CARD */}
-      <motion.div
+      {/* <motion.div
         className="absolute bottom-0 left-1/2 z-20 flex w-full -translate-x-1/2 translate-y-1/3 justify-center md:translate-y-1/2"
         animate={{ y: [0, -15, 0] }}
         transition={{
@@ -150,7 +191,7 @@ export default function Home() {
             }}
           />
         </div>
-      </motion.div>
+      </motion.div> */}
     </section>
   );
 }

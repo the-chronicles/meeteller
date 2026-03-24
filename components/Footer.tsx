@@ -102,6 +102,7 @@ export const Footer = () => {
                   }}
                   whileHover={{ x: 4, opacity: 1 }}
                   transition={{ duration: 0.25 }}
+                  className="text-sm font-light text-[#8c8b8b] hover:text-gray-300"
                 >
                   <Link href="#">{item}</Link>
                 </motion.li>

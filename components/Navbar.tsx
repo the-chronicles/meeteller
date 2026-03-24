@@ -21,13 +21,17 @@ export const Navbar = () => {
   return (
     <nav className="pointer-events-none fixed top-0 left-0 z-50 mt-10 flex w-full justify-center">
       {/* Centered Container */}
+      
       <div
-        className={`pointer-events-auto  flex h-16 w-[90%] items-center justify-between px-8 py-9 transition-all duration-300 md:w-[70%] lg:w-[55%] ${
+        className={`pointer-events-auto rounded-md flex h-16 w-[90%] items-center justify-between px-8 py-9 transition-all duration-300 md:w-[70%] lg:w-[55%] ${
           scrolled
             ? "bg-gray-100/70 shadow-xl backdrop-blur-xl"
             : "bg-white shadow-sm"
         } `}
       >
+                  {/* <div className="pointer-events-none absolute top-0 left-0 z-10 h-full w-20 bg-linear-to-r from-white to-transparent" /> */}
+          {/* <div className="pointer-events-none absolute top-0 right-0 z-10 h-full w-20 bg-linear-to-l from-white to-transparent" /> */}
+
         {/* Logo */}
         <Link href="/" className="shrink-0">
           <Image
@@ -56,7 +60,7 @@ export const Navbar = () => {
           <Link href="/login">Login</Link>
           <Link
             href="/signup"
-            className="rounded-full bg-[#5b09c4] px-4 py-2 text-white transition hover:bg-[#5b09c4]/90"
+            className=" bg-[#5b09c4] rounded-md px-4 py-2 text-white transition hover:bg-[#5b09c4]/90"
           >
             Get Started
           </Link>

@@ -72,8 +72,8 @@ export default function Login() {
           />
         </div> */}
 
-        <h1 className="text-center text-3xl font-semibold text-white">
-          Welcome back
+        <h1 className="text-center font-helvetica text-3xl font-semibold text-white">
+          Welcome Back!
         </h1>
 
         {error && (
@@ -89,7 +89,7 @@ export default function Login() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-12 w-full rounded-xl bg-gray-100 pr-4 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
+              className="h-12 w-full rounded-xl font-light bg-gray-100 pr-4 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
             />
             <span className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400">
               <Mail size={18} />
@@ -102,7 +102,7 @@ export default function Login() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-12 w-full rounded-xl bg-gray-100 pr-12 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
+              className="h-12 w-full rounded-xl bg-gray-100 pr-12 pl-11 font-light text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
             />
 
             <span className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400">
@@ -125,14 +125,14 @@ export default function Login() {
               type="checkbox"
               checked={rememberMe}
               onChange={(e) => setRememberMe(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+              className="h-4 w-4 rounded border-gray-300 font-light text-black focus:ring-black"
             />
             Remember me
           </label>
 
           <button
             type="button"
-            className="text-sm text-white/70 hover:underline"
+            className="text-sm font-light text-white/70 hover:underline"
           >
             Forgot password?
           </button>

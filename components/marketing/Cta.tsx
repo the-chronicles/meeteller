@@ -4,15 +4,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRef } from "react";
+import { Button } from "@/components/ui/button";
 
 export function CTASection() {
   const ref = useRef(null);
 
-
   return (
     <section
       ref={ref}
-      className="relative py-28 bg-[#5b09c4] text-white overflow-hidden"
+      className="relative overflow-hidden bg-[#5b09c4] py-28 text-white"
     >
       {/* FULL BACKGROUND IMAGE WITH MOTION */}
       <motion.div>
@@ -27,7 +27,7 @@ export function CTASection() {
 
       {/* OPTIONAL GLOW (classy and subtle) */}
       <motion.div
-        className="absolute inset-0 bg-gradient-to-b-from-transparent-via-[#ffffff0a]-to-transparent"
+        className="bg-gradient-to-b-from-transparent-via-[#ffffff0a]-to-transparent absolute inset-0"
         animate={{
           opacity: [0.06, 0.12, 0.06],
         }}
@@ -39,10 +39,10 @@ export function CTASection() {
       />
 
       {/* CONTENT */}
-      <div className="relative max-w-4xl mx-auto text-center px-6 z-10">
+      <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
         {/* Title */}
         <motion.h2
-          className="text-4xl font-bold mb-4"
+          className="font-helvetica mb-4 text-5xl font-bold"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
@@ -53,7 +53,7 @@ export function CTASection() {
 
         {/* Subtitle */}
         <motion.p
-          className="text-lg mb-8 opacity-90"
+          className="mb-8 font-light"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.15 }}
@@ -71,12 +71,13 @@ export function CTASection() {
           viewport={{ once: true }}
         >
           <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.96 }}>
-            <Link
-              href="/auth/signup"
-              className="px-8 py-4 bg-white text-[#5b09c4] font-semibold rounded-sm shadow transition"
+            <Button
+              asChild
+              size="lg"
+              className="text-[#5b09c4] bg-white hover:bg-white/80"
             >
-              Download Now
-            </Link>
+              <Link href="/signup">Get Started</Link>
+            </Button>
           </motion.div>
         </motion.div>
       </div>

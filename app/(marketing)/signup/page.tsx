@@ -77,7 +77,7 @@ export default function Signup() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-black via-[#0a0014] to-[#5b09c4] px-4">
       <div className="mt-20 w-full max-w-md rounded-2xl border border-white/10 bg-white/10 p-10 shadow-xl backdrop-blur-lg">
-        <div className="mb-3 flex justify-center">
+        {/* <div className="mb-3 flex justify-center">
           <Image
             src="/logo-white.png"
             alt="Meeteller logo"
@@ -85,9 +85,9 @@ export default function Signup() {
             height={100}
             className="mb-4"
           />
-        </div>
+        </div> */}
 
-        <h1 className="text-center text-xl font-semibold text-white">
+        <h1 className="text-center font-helvetica text-3xl font-semibold text-white">
           Create your account
         </h1>
 
@@ -120,7 +120,7 @@ export default function Signup() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-12 w-full rounded-xl bg-gray-100 pr-4 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
+              className="h-12 w-full font-light rounded-xl bg-gray-100 pr-4 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
             />
             <span className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400">
               <Mail size={18} />
@@ -133,7 +133,7 @@ export default function Signup() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-12 w-full rounded-xl bg-gray-100 pr-12 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
+              className="h-12 w-full rounded-xl font-light bg-gray-100 pr-12 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
             />
 
             <span className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400">
@@ -155,7 +155,7 @@ export default function Signup() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
+                className="h-4 w-4 font-light rounded border-gray-300 text-black focus:ring-black"
               />
               Remember me
             </label>

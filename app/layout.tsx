@@ -70,7 +70,7 @@ export default function RootLayout({
       <body className="bg-white text-gray-900">
         <ThemeProvider>
           <EventsProvider>{children}</EventsProvider>
-        </ThemeProvider>s
+        </ThemeProvider>
       </body>
     </html>
   );
