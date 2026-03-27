@@ -18,7 +18,6 @@ export function WidgetShell({
 }) {
   const [minimized, setMinimized] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  
 
   const content = (
     <div className="rounded-2xl border bg-white shadow-2xl/10 dark:border-white/10 dark:bg-black">
@@ -49,7 +48,7 @@ export function WidgetShell({
             </button>
           </div>
 
-          <h3 className="text-sm font-medium">{title}</h3>
+          <h3 className="font-helvetica text-sm font-medium">{title}</h3>
         </div>
 
         <GripVertical

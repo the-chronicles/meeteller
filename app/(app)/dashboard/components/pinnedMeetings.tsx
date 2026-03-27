@@ -33,7 +33,7 @@ const pinnedMeetings = [
 
 export default function PinnedMeetings() {
   return (
-    <div className="rounded-xl bg-white dark:bg-black border border-gray-200 dark:border-white/10 p-4 shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-black">
       {/* <h3 className="mb-4 text-sm font-semibold">Pinned Meetings</h3> */}
 
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
@@ -45,13 +45,13 @@ export default function PinnedMeetings() {
               key={m.id}
               href={`/meetings/${m.id}`}
               className={clsx(
-                "relative p-4 rounded-xl",
-                "bg-gradient-to-br",
+                "relative rounded-xl p-4",
+                "bg-linear-to-br",
                 style.card,
                 style.glow,
-                "shadow-lg hover:shadow-xl transition",
+                "shadow-lg transition hover:shadow-xl",
                 "animate-pin-drop",
-                m.rotate
+                m.rotate,
               )}
             >
               <RealisticPin color={style.pin} />
@@ -59,8 +59,12 @@ export default function PinnedMeetings() {
               <div className="mt-6 flex items-start gap-3">
                 <Mic size={18} className="text-gray-400" />
                 <div>
-                  <p className="text-sm font-medium">{m.title}</p>
-                  <p className="text-xs text-gray-600">{m.date}</p>
+                  <p className="font-medium md:text-xs lg:text-[12px]">
+                    {m.title}
+                  </p>
+                  <p className="text-gray-600 md:text-xs lg:text-[12px]">
+                    {m.date}
+                  </p>
                 </div>
               </div>
             </Link>

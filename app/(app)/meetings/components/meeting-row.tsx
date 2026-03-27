@@ -21,9 +21,7 @@ function relativeDayLabel(d: Date) {
   if (diff === 0) return "TODAY";
   if (diff === -1) return "YESTERDAY";
 
-  return d
-    .toLocaleDateString(undefined, { weekday: "short" })
-    .toUpperCase();
+  return d.toLocaleDateString(undefined, { weekday: "short" }).toUpperCase();
 }
 
 function durationLabel(mins: number) {
@@ -40,8 +38,7 @@ export function MeetingRow({ meeting }: { meeting: Meeting }) {
   return (
     <Link
       href={`/meetings/${meeting.id}`}
-      className="group block rounded-2xl border bg-white p-4 transition hover:bg-gray-50
-                 dark:bg-[#0a0014] dark:hover:bg-white/5"
+      className="group block rounded-2xl border bg-white p-4 transition hover:bg-gray-50 dark:bg-[#0a0014] dark:hover:bg-white/5"
     >
       <div className="flex gap-4">
         {/* Left date/time box */}
@@ -58,11 +55,12 @@ export function MeetingRow({ meeting }: { meeting: Meeting }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="truncate text-lg font-semibold text-[#5b09c4] dark:text-white">
+              <h3 className="font-helvetica truncate text-lg font-semibold text-[#5b09c4] dark:text-white">
                 {meeting.title}
               </h3>
               <p className="mt-1 line-clamp-1 text-sm text-gray-500 dark:text-gray-400">
-                {meeting.summary || "Meeting recording and transcript processing."}
+                {meeting.summary ||
+                  "Meeting recording and transcript processing."}
               </p>
 
               {/* Duration under (like screenshot) */}

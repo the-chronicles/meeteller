@@ -31,7 +31,6 @@ const DEFAULT_WIDGETS: Widget[] = [
   { id: "pinned-meetings", size: "half" },
 ];
 
-
 export default function DashboardPage() {
   const [widgets, setWidgets] = useState<Widget[]>(DEFAULT_WIDGETS);
   const [mounted, setMounted] = useState(false);
@@ -65,23 +64,22 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen space-y-6 bg-gray-50 p-6 dark:bg-black">
       <DashboardGreeting />
-     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-  {/* LEFT: STATS */}
-  <div className="flex-1">
-    <StatsCards />
-  </div>
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        {/* LEFT: STATS */}
+        <div className="flex-1">
+          <StatsCards />
+        </div>
 
-  {/* RIGHT: RESET */}
-  <div className="flex justify-end">
-    <button
-      onClick={resetDashboard}
-      className="rounded-lg border border-red-200 bg-red-500 px-4 py-2 text-sm font-medium text-white hover:cursor-pointer dark:border-white/10 dark:bg-black dark:hover:bg-white/10"
-    >
-      Reset Dashboard
-    </button>
-  </div>
-</div>
-
+        {/* RIGHT: RESET */}
+        <div className="flex justify-end">
+          <button
+            onClick={resetDashboard}
+            className="rounded-lg border border-red-200 bg-red-500 px-4 py-2 text-sm font-medium text-white hover:cursor-pointer dark:border-white/10 dark:bg-black dark:hover:bg-white/10"
+          >
+            Reset Dashboard
+          </button>
+        </div>
+      </div>
 
       <DndContext
         collisionDetection={closestCenter}
@@ -100,7 +98,6 @@ export default function DashboardPage() {
           strategy={verticalListSortingStrategy}
         >
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-
             {widgets.map((widget) => (
               <SortableWidget key={widget.id} id={widget.id}>
                 {({
@@ -143,8 +140,6 @@ export default function DashboardPage() {
                       </WidgetShell>
                     )}
 
-                   
-
                     {widget.id === "upcoming-meetings" && (
                       <WidgetShell
                         title="Upcoming Meetings"
@@ -159,7 +154,7 @@ export default function DashboardPage() {
                         <UpcomingMeetings />
                       </WidgetShell>
                     )}
-                    
+
                     {widget.id === "pinned-meetings" && (
                       <WidgetShell
                         title="Pinned Meetings"
@@ -176,7 +171,6 @@ export default function DashboardPage() {
                     )}
                   </div>
                 )}
-                
               </SortableWidget>
             ))}
           </div>

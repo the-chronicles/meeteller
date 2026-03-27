@@ -30,7 +30,9 @@ export default function UpcomingMeetings() {
   return (
     <div className="rounded-xl bg-white p-5 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Upcoming Meetings</h2>
+        <h2 className="font-helvetica text-lg font-semibold">
+          Upcoming Meetings
+        </h2>
         <button
           onClick={() => setOpen(true)}
           className="rounded-full bg-emerald-500 px-4 py-2 text-sm text-white"

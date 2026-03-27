@@ -11,11 +11,11 @@ export const SOLID_COLORS = [
 ];
 
 export const GRADIENTS = [
-  "from-indigo-600 via-purple-600 to-pink-600",
-  "from-sky-500 via-blue-600 to-indigo-700",
-  "from-emerald-500 via-teal-600 to-cyan-700",
-  "from-orange-500 via-red-500 to-pink-600",
-  "from-zinc-800 via-slate-900 to-black",
+  "linear-gradient(135deg, #4f46e5, #7c3aed, #ec4899)",
+  "linear-gradient(135deg, #0ea5e9, #2563eb, #4338ca)",
+  "linear-gradient(135deg, #10b981, #0d9488, #0e7490)",
+  "linear-gradient(135deg, #f97316, #ef4444, #ec4899)",
+  "linear-gradient(135deg, #27272a, #0f172a, #000000)",
 ];
 
 export const DEFAULT_IMAGES = [
@@ -23,4 +23,3 @@ export const DEFAULT_IMAGES = [
   "/bg/glass.jpeg",
   "/bg/study.JPG",
 ];
-
