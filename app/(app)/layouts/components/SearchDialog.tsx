@@ -14,10 +14,7 @@ export function SearchDialog({ onClose }: { onClose: () => void }) {
   const saveSearch = (value: string) => {
     if (!value.trim()) return;
 
-    const updated = [
-      value,
-      ...recent.filter((r) => r !== value),
-    ].slice(0, 5);
+    const updated = [value, ...recent.filter((r) => r !== value)].slice(0, 5);
 
     setRecent(updated);
     localStorage.setItem("recent-searches", JSON.stringify(updated));
@@ -32,15 +29,7 @@ export function SearchDialog({ onClose }: { onClose: () => void }) {
       />
 
       {/* Dialog */}
-      <div
-        className="
-          relative w-full max-w-2xl rounded-2xl
-          bg-white/50 dark:bg-zinc-900/80
-          backdrop-blur-xl shadow-2xl
-          p-4
-          animate-in fade-in zoom-in-95
-        "
-      >
+      <div className="animate-in fade-in zoom-in-95 relative w-full max-w-2xl rounded-2xl bg-white p-4 shadow-2xl backdrop-blur-xl dark:bg-zinc-900/80">
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-black/5 pb-3 dark:border-white/10">
           <Search className="h-4 w-4 opacity-60" />
@@ -76,9 +65,7 @@ export function SearchDialog({ onClose }: { onClose: () => void }) {
         {/* Filters */}
         {showFilters && (
           <div className="mt-3 rounded-xl bg-black/5 p-3 text-sm dark:bg-white/5">
-            <p className="mb-2 text-xs font-medium opacity-70">
-              Filters
-            </p>
+            <p className="mb-2 text-xs font-medium opacity-70">Filters</p>
 
             <div className="flex flex-wrap gap-2">
               {["Meetings", "Tasks", "Notes", "People"].map((f) => (
@@ -96,9 +83,7 @@ export function SearchDialog({ onClose }: { onClose: () => void }) {
         {/* Content */}
         <div className="mt-4">
           {query ? (
-            <p className="text-sm text-gray-500">
-              Searching for “{query}”…
-            </p>
+            <p className="text-sm text-gray-500">Searching for “{query}”…</p>
           ) : recent.length > 0 ? (
             <>
               <p className="mb-2 text-xs font-medium opacity-70">
@@ -110,11 +95,7 @@ export function SearchDialog({ onClose }: { onClose: () => void }) {
                   <li
                     key={item}
                     onClick={() => setQuery(item)}
-                    className="
-                      cursor-pointer rounded-lg px-3 py-2
-                      text-sm hover:bg-black/5
-                      dark:hover:bg-white/10
-                    "
+                    className="cursor-pointer rounded-lg px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/10"
                   >
                     {item}
                   </li>
@@ -122,9 +103,7 @@ export function SearchDialog({ onClose }: { onClose: () => void }) {
               </ul>
             </>
           ) : (
-            <p className="text-sm text-gray-500">
-              Start typing to search…
-            </p>
+            <p className="text-sm text-gray-500">Start typing to search…</p>
           )}
         </div>
 

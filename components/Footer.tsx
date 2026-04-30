@@ -11,15 +11,11 @@ export const Footer = () => {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: "easeOut" }}
       viewport={{ once: true }}
-      className="relative w-full bg-black text-[#282828] pt-20 pb-14 overflow-hidden"
+      className="relative w-full overflow-hidden bg-black pt-20 pb-14 text-[#282828]"
     >
       {/* GIANT BACKGROUND TEXT WITH SLOW FLOAT */}
       <motion.div
-        className="
-          pointer-events-none select-none 
-          absolute md:bottom-[-20%] bottom-[-4%] left-1/2 -translate-x-1/2
-          opacity-[0.05] text-[6rem] md:text-[24rem] font-bold text-white leading-none
-        "
+        className="pointer-events-none absolute bottom-[-4%] left-1/2 -translate-x-1/2 text-[6rem] leading-none font-bold text-white opacity-[0.05] select-none md:bottom-[-20%] md:text-[18rem]"
         animate={{ y: [0, -20, 0] }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
       >
@@ -27,14 +23,7 @@ export const Footer = () => {
       </motion.div>
 
       {/* TOP SECTION */}
-      <div
-        className="
-          relative z-10 
-          max-w-7xl mx-auto px-6
-          grid grid-cols-2 md:grid-cols-4 
-          gap-12
-        "
-      >
+      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-2 gap-12 px-6 md:grid-cols-4">
         {/* LOGO */}
         <motion.div
           className="col-span-2 md:col-span-1"
@@ -56,19 +45,20 @@ export const Footer = () => {
         {[
           {
             title: "How It Works",
-            links: ["Features", "Platforms", "Ecosystem", "Integrations"],
+            links: [""],
           },
           {
             title: "Pricing",
-            links: ["Individual", "Pro", "Teams"],
+            links: ["Individual", "Teams"],
           },
           {
             title: "Download",
-            links: ["iOS app", "Android app", "Chrome extension", "Desktop"],
-          },
-          {
-            title: "Social",
-            links: ["LinkedIn", "X"],
+            links: [
+              "iOS app (Coming Soon)",
+              "Android app (Coming Soon)",
+              "Chrome extension (Coming Soon)",
+              "Desktop (Coming Soon)",
+            ],
           },
         ].map((section, idx) => (
           <motion.div
@@ -78,7 +68,7 @@ export const Footer = () => {
             transition={{ duration: 0.6, delay: idx * 0.15 }}
             viewport={{ once: true }}
           >
-            <h4 className="font-medium text-white mb-4">{section.title}</h4>
+            <h4 className="mb-4 font-medium text-white">{section.title}</h4>
 
             {/* Sub-links */}
             <motion.ul
@@ -114,15 +104,7 @@ export const Footer = () => {
 
       {/* BOTTOM FOOTER */}
       <motion.div
-        className="
-          relative z-10 
-          max-w-7xl mx-auto px-6 mt-20 pt-8 
-          border-t border-[#5b09c4] 
-          flex flex-col md:flex-row 
-          items-start md:items-center 
-          justify-between 
-          text-white text-sm gap-6
-        "
+        className="relative z-10 mx-auto mt-20 flex max-w-7xl flex-col items-start justify-between gap-6 border-t border-[#5b09c4] px-6 pt-8 text-sm text-white md:flex-row md:items-center"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.4 }}
@@ -130,7 +112,7 @@ export const Footer = () => {
       >
         <p>© {new Date().getFullYear()} Meeteller</p>
 
-        <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+        <div className="flex flex-col gap-4 md:flex-row md:gap-6">
           {["Privacy policy", "Terms of service", "Cookie settings"].map(
             (item, i) => (
               <motion.div
@@ -142,7 +124,7 @@ export const Footer = () => {
                   {item}
                 </Link>
               </motion.div>
-            )
+            ),
           )}
         </div>
       </motion.div>

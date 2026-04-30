@@ -104,7 +104,7 @@ export default function AppearanceSettings() {
         </h3>
 
         <div className="flex flex-wrap gap-2">
-          {(["color", "gradient", "image"] as const).map((type) => (
+          {(["color", , "image"] as const).map((type) => (
             <button
               key={type}
               onClick={() => {
@@ -117,12 +117,12 @@ export default function AppearanceSettings() {
                   });
                 }
 
-                if (type === "gradient") {
-                  updateSettings({
-                    bgType: "gradient",
-                    bgValue: gradientValue,
-                  });
-                }
+                // if (type === "gradient") {
+                //   updateSettings({
+                //     bgType: "gradient",
+                //     bgValue: gradientValue,
+                //   });
+                // }
 
                 if (type === "image") {
                   updateSettings({
@@ -202,7 +202,7 @@ export default function AppearanceSettings() {
         </div>
       )}
 
-      {settings.bgType === "gradient" && (
+      {/* {settings.bgType === "gradient" && (
         <div className="space-y-4">
           <h3 className="text-sm font-medium text-gray-900 dark:text-white">
             Gradient
@@ -295,7 +295,7 @@ export default function AppearanceSettings() {
             style={{ backgroundImage: makeGradient(g1, g2) }}
           />
         </div>
-      )}
+      )} */}
 
       {settings.bgType === "image" && (
         <div className="space-y-6">

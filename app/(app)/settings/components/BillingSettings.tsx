@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Download } from "lucide-react";
+import { formatCurrency } from "@/utils/formatCurrency";
+import { payWithPaystack } from "@/utils/paystack";
+import { useUser } from "@/context/UserProvider";
 
 type BillingCycle = "monthly" | "yearly";
 
@@ -9,7 +13,7 @@ const PLANS = [
   {
     id: "basic",
     name: "Welcome Gift",
-    subtitle: "Perfect to get started",
+    subtitle: "Get started for free",
     prices: {
       monthly: 0,
       yearly: 0,
@@ -17,44 +21,45 @@ const PLANS = [
     featured: false,
     current: true,
     features: [
-      "Up to 10 team members",
-      "Basic dashboard access",
-      "Community support",
+      "Full platform access",
+      "Up to 2 meetings",
+      "Basic experience to explore features",
     ],
   },
   {
     id: "personal",
     name: "Personal Plan",
-    subtitle: "For individual creators",
+    subtitle: "For individuals",
     prices: {
-      monthly: 199,
-      yearly: 199 * 10, // 2 months free
+      monthly: 9999,
+      yearly: Math.floor(9999 * 12 * 0.9),
     },
     featured: true,
     current: false,
     features: [
-      "1 team member",
+      "Full platform access",
+      "1 member",
       "Unlimited exports",
-      "Commercial use license",
-      "Advanced editor access",
-      "Shareable preview links",
+      "Task tracking",
     ],
   },
   {
     id: "teams",
     name: "Teams Plan",
-    subtitle: "For growing teams",
+    subtitle: "For teams & collaboration",
     prices: {
-      monthly: 299,
-      yearly: 299 * 10, // 2 months free
+      monthly: 30000,
+      yearly: Math.floor(30000 * 12 * 0.85),
     },
     featured: false,
     current: false,
     features: [
       "Up to 20 team members",
+      "Team Dashboard",
       "Team management",
       "Unified billing",
       "Priority support",
+      "Task tracking",
     ],
   },
 ];
@@ -67,13 +72,50 @@ const INVOICES = [
 ];
 
 export default function BillingSettings() {
-  const [billingCycle, setBillingCycle] =
-    useState<BillingCycle>("monthly");
+  const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
 
-  const handleSubscribe = (planId: string) => {
-    console.log("Subscribing to:", planId, billingCycle);
-    // 👉 Hook this to Paystack / Stripe
-    // router.push(`/checkout?plan=${planId}&cycle=${billingCycle}`)
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly");
+
+  const formatPrice = (amount: number) => amount.toLocaleString("en-NG");
+
+  const handleDownload = (invoice: string) => {
+    const link = document.createElement("a");
+    link.href = `/invoices/${invoice}.pdf`; // 👈 update to your backend route
+    link.download = `${invoice}.pdf`;
+    link.click();
+  };
+
+  // const handleSubscribe = (planId: string) => {
+  //   console.log("Subscribing to:", planId, billingCycle);
+  //   // 👉 Hook this to Paystack / Stripe
+  //   // router.push(`/checkout?plan=${planId}&cycle=${billingCycle}`)
+  // };
+
+  const { user } = useUser();
+
+  const handleSubscribe = (plan: any) => {
+    if (!plan?.prices?.[billingCycle]) {
+      console.error("Invalid plan data:", plan);
+      return;
+    }
+
+    if (!user?.email) {
+      console.error("User email is required");
+      return;
+    }
+
+    payWithPaystack({
+      email: user.email,
+      amount: plan.prices[billingCycle] * 100,
+
+      onSuccess: () => {
+        console.log("Payment successful");
+      },
+
+      onClose: () => {
+        console.log("Payment closed");
+      },
+    });
   };
 
   return (
@@ -118,14 +160,14 @@ export default function BillingSettings() {
             <div
               key={plan.id}
               className={`rounded-2xl border p-7 ${
-                plan.featured
-                  ? "border-[#5b09c4] bg-[#5b09c4]/10"
-                  : "bg-white"
+                plan.featured ? "border-[#5b09c4] bg-[#5b09c4]/10" : "bg-white"
               }`}
             >
               {/* Title */}
               <div className="space-y-1">
-                <h3 className="text-lg font-semibold">{plan.name}</h3>
+                <h3 className="font-helvetica text-lg font-semibold">
+                  {plan.name}
+                </h3>
                 <p className="text-sm text-gray-500">{plan.subtitle}</p>
               </div>
 
@@ -133,24 +175,29 @@ export default function BillingSettings() {
               <div className="mt-6">
                 <div className="flex items-end gap-1">
                   <span className="text-4xl font-semibold">
-                    ₦{price}
+                    {formatCurrency(price)}
                   </span>
                 </div>
+
                 <p className="mt-1 text-sm text-gray-500">
                   {billingCycle === "monthly"
                     ? "Billed per month"
-                    : "Billed yearly (2 months free)"}
+                    : "Billed yearly"}
                 </p>
+
+                {billingCycle === "yearly" && !plan.current && (
+                  <p className="text-sm text-gray-400 line-through">
+                    ₦{formatPrice(plan.prices.monthly * 12)}
+                  </p>
+                )}
               </div>
 
               {/* Discount */}
               {!plan.current && billingCycle === "yearly" && (
-                <div className="mt-4 rounded-lg border border-dashed bg-white px-4 py-3 text-sm">
-                  <span className="font-medium">
-                    Yearly discount applied
-                  </span>{" "}
-                  — save more with annual billing
-                </div>
+                <span className="font-medium">
+                  {plan.id === "personal" && "Save 10% with yearly billing"}
+                  {plan.id === "teams" && "Save 15% with yearly billing"}
+                </span>
               )}
 
               {/* CTA */}
@@ -165,7 +212,7 @@ export default function BillingSettings() {
                   </button>
                 ) : (
                   <button
-                    onClick={() => handleSubscribe(plan.id)}
+                    onClick={() => handleSubscribe(plan)}
                     className={`w-full rounded-xl px-4 py-3 text-sm font-medium transition ${
                       plan.featured
                         ? "bg-black text-white hover:bg-black/90"
@@ -203,27 +250,71 @@ export default function BillingSettings() {
 
         <div className="rounded-xl border bg-white">
           {INVOICES.map((invoice, index) => (
-            <label
+            <div
               key={invoice}
-              className={`flex cursor-pointer items-center gap-3 px-4 py-3 text-sm hover:bg-gray-50 ${
+              className={`flex items-center gap-3 px-4 py-3 text-sm hover:bg-gray-50 ${
                 index !== INVOICES.length - 1 ? "border-b" : ""
               }`}
             >
-              <input
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300"
-              />
-
               <div className="flex flex-1 items-center gap-3">
                 <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
                   PDF
                 </span>
                 <span>{invoice}</span>
               </div>
-            </label>
+
+              <button
+                // onClick={() => handleDownload(invoice)}
+                onClick={() => setSelectedInvoice(invoice)}
+                className="rounded-lg p-2 transition hover:bg-gray-200"
+              >
+                <Download className="h-4 w-4 text-gray-600" />
+              </button>
+            </div>
           ))}
         </div>
       </div>
+
+      {selectedInvoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-[90%] max-w-3xl rounded-xl bg-white p-4">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-medium">{selectedInvoice}</h3>
+
+              <button
+                onClick={() => setSelectedInvoice(null)}
+                className="text-sm text-gray-500"
+              >
+                Close
+              </button>
+            </div>
+
+            {/* PDF Preview */}
+            <iframe
+              src={`/invoices/${selectedInvoice}.pdf`}
+              className="h-[400px] w-full rounded-lg border"
+            />
+
+            {/* Actions */}
+            <div className="mt-4 flex justify-end gap-3">
+              <button
+                onClick={() => setSelectedInvoice(null)}
+                className="px-4 py-2 text-sm"
+              >
+                Cancel
+              </button>
+
+              <a
+                href={`/invoices/${selectedInvoice}.pdf`}
+                download
+                className="rounded-lg bg-black px-4 py-2 text-sm text-white"
+              >
+                Download
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
