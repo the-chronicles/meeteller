@@ -1,9 +1,14 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronsLeft, Lock, Menu, X } from "lucide-react";
+
+import { useContext } from "react";
+import { AuthContext } from "@/context/auth-context";
+
 import Image from "next/image";
 import {
   IconCalendar,
@@ -34,6 +39,8 @@ const teamChildren = [
 ];
 
 export function Sidebar() {
+  const auth = useContext(AuthContext);
+
   const pathname = usePathname();
 
   const [collapsed, setCollapsed] = useState(false);
@@ -50,11 +57,6 @@ export function Sidebar() {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
-
-  const handleLogout = async () => {
-    await fetch("/auth/logout", { method: "POST" });
-    window.location.href = "/";
-  };
 
   const renderMainItem = ({
     name,
@@ -229,7 +231,7 @@ export function Sidebar() {
         </Link>
 
         <button
-          onClick={handleLogout}
+          onClick={auth?.logout}
           className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10 ${
             collapsed ? "justify-center" : ""
           }`}

@@ -2,13 +2,15 @@
 
 import { useTheme } from "next-themes";
 import { Search } from "lucide-react";
-import { useUser } from "@/context/UserProvider";
-import { useEffect, useState } from "react";
+// import { useUser } from "@/context/UserProvider";
+import { useContext, useEffect, useState } from "react";
 import { SearchDialog } from "./components/SearchDialog";
 import { ThemeSwitch } from "./components/ThemeSwitch";
+import { AuthContext } from "@/context/auth-context";
 
 export function Topbar() {
-  const { loading } = useUser();
+  // const { loading } = useUser();
+  const loading = useContext(AuthContext)?.loading;
   const { theme, setTheme } = useTheme();
   const [open, setOpen] = useState(false);
 

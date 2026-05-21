@@ -1,11 +1,15 @@
 // import { ScribbleLine } from "./ScribbleLine";
 import { TypingNotes } from "./TypingNotes";
 import { AudioWaveCanvas } from "./AudioWaveCanvas";
-import { useUser } from "@/context/UserProvider";
+// import { useUser } from "@/context/UserProvider";
 import { useDayMood } from "@/hooks/useDayMood";
+import { AuthContext } from "@/context/auth-context";
+import { useContext } from "react";
 
 export function DashboardGreeting() {
-  const { user } = useUser();
+  const auth = useContext(AuthContext);
+
+  const user = auth?.user;
   const mood = useDayMood();
 
   const greeting =
@@ -20,7 +24,7 @@ export function DashboardGreeting() {
       <AudioWaveCanvas />
 
       <div className="relative z-10 space-y-4 text-center">
-        <h2 className="font-helvetica font-bold text-gray-900 md:text-5xl sm: 6xl lg:text-4xl dark:text-white">
+        <h2 className="font-helvetica sm: 6xl font-bold text-gray-900 md:text-5xl lg:text-4xl dark:text-white">
           {greeting},
           {user?.email && (
             <span className="text-gray-500 dark:text-gray-400">

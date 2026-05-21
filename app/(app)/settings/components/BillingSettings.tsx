@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Check, Download } from "lucide-react";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { payWithPaystack } from "@/utils/paystack";
-import { useUser } from "@/context/UserProvider";
+// import { useUser } from "@/context/UserProvider";
+import { AuthContext } from "@/context/auth-context";
 
 type BillingCycle = "monthly" | "yearly";
 
@@ -91,7 +92,10 @@ export default function BillingSettings() {
   //   // router.push(`/checkout?plan=${planId}&cycle=${billingCycle}`)
   // };
 
-  const { user } = useUser();
+  // const { user } = useUser();
+  const auth = useContext(AuthContext);
+
+  const user = auth?.user;
 
   const handleSubscribe = (plan: any) => {
     if (!plan?.prices?.[billingCycle]) {

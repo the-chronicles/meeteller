@@ -1,8 +1,8 @@
 import "@/app/globals.css";
+import { AuthProvider } from "@/context/auth-context";
 import { EventsProvider } from "@/context/EventProvider";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import localFont from "next/font/local";
-
 
 const helvetica = localFont({
   src: [
@@ -53,8 +53,6 @@ const sora = localFont({
   display: "swap",
 });
 
-
-
 export const metadata = {
   title: "Meeteller — AI Meeting Assistant",
   description: "Transcribe, summarize, and automate your meetings.",
@@ -66,10 +64,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${helvetica.variable} ${sora.variable} font-sans`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${helvetica.variable} ${sora.variable} font-sans`}
+    >
       <body className="bg-white text-gray-900">
         <ThemeProvider>
-          <EventsProvider>{children}</EventsProvider>
+          <AuthProvider>
+            <EventsProvider>{children}</EventsProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

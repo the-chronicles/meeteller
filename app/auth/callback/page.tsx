@@ -1,4 +1,3 @@
-
 // // https://zeznkiiwenfdnykaprsa.supabase.co/auth/v1/callback
 // // xhttp://localhost:8080/api/oauth/google/callback
 
@@ -39,33 +38,57 @@
 //   return <p className="mt-20 text-center">Signing you in…</p>;
 // }
 
+// "use client";
 
+// import { useEffect } from "react";
+// import { supabase } from "@/lib/supabase/browser";
+// import { useRouter } from "next/navigation";
+
+// export default function AuthCallback() {
+//   const router = useRouter();
+
+//   useEffect(() => {
+//     const syncSession = async () => {
+//       const { data } = await supabase.auth.getSession();
+
+//       if (!data.session) {
+//         router.replace("/login");
+//         return;
+//       }
+
+//       // ✅ MUST match middleware-protected route
+//       router.replace("/dashboard");
+//       router.refresh();
+//     };
+
+//     syncSession();
+//   }, [router]);
+
+//   return <p className="mt-20 text-center">Signing you in…</p>;
+// }
 
 "use client";
 
 import { useEffect } from "react";
-import { supabase } from "@/lib/supabase/browser";
-import { useRouter } from "next/navigation";
 
-export default function AuthCallback() {
+import { useRouter, useSearchParams } from "next/navigation";
+
+export default function AuthCallbackPage() {
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
   useEffect(() => {
-    const syncSession = async () => {
-      const { data } = await supabase.auth.getSession();
+    const token = searchParams.get("token");
 
-      if (!data.session) {
-        router.replace("/login");
-        return;
-      }
+    if (token) {
+      localStorage.setItem("access_token", token);
 
-      // ✅ MUST match middleware-protected route
-      router.replace("/dashboard");
-      router.refresh();
-    };
+      router.push("/dashboard");
+    } else {
+      router.push("/login");
+    }
+  }, [router, searchParams]);
 
-    syncSession();
-  }, [router]);
-
-  return <p className="mt-20 text-center">Signing you in…</p>;
+  return <div>Signing you in...</div>;
 }

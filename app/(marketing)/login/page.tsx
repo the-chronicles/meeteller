@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { supabase } from "@/lib/supabase/browser";
+// import { supabase } from "@/lib/supabase/browser";
+import { login } from "@/services/auth.service";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
 import Image from "next/image";
@@ -16,44 +17,76 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
-  const signInWithGoogle = async () => {
-    setError(null);
+  // const signInWithGoogle = async () => {
+  //   setError(null);
 
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${location.origin}/auth/callback`,
-      },
-    });
+  //   await supabase.auth.signInWithOAuth({
+  //     provider: "google",
+  //     options: {
+  //       redirectTo: `${location.origin}/auth/callback`,
+  //     },
+  //   });
+  // };
+
+  // const signInWithGoogle = async () => {
+  //   window.location.href = "http://localhost:3000/auth/google";
+  // };
+
+  const signInWithGoogle = async () => {
+    window.location.href = process.env.NEXT_PUBLIC_BASE_URL + "/auth/google";
   };
+
+  // const signInWithMicrosoft = async () => {
+  //   setError(null);
+
+  //   await supabase.auth.signInWithOAuth({
+  //     provider: "azure",
+  //     options: {
+  //       redirectTo: `${location.origin}/auth/callback`,
+  //     },
+  //   });
+  // };
 
   const signInWithMicrosoft = async () => {
-    setError(null);
-
-    await supabase.auth.signInWithOAuth({
-      provider: "azure",
-      options: {
-        redirectTo: `${location.origin}/auth/callback`,
-      },
-    });
+    alert("Microsoft auth coming soon");
   };
+
+  // const loginWithEmail = async (email: string, password: string) => {
+  //   setError(null);
+  //   setLoading(true);
+  //   try {
+  //     const { error } = await supabase.auth.signInWithPassword({
+  //       email,
+  //       password,
+  //     });
+
+  //     if (error) {
+  //       setError(error.message);
+  //     } else {
+  //       window.location.href = "/dashboard";
+  //     }
+  //   } catch (err: any) {
+  //     setError(err.message ?? "Sign in failed");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const loginWithEmail = async (email: string, password: string) => {
     setError(null);
     setLoading(true);
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const result = await login({
         email,
         password,
       });
 
-      if (error) {
-        setError(error.message);
-      } else {
-        window.location.href = "/dashboard";
-      }
+      localStorage.setItem("access_token", result.access_token);
+
+      window.location.href = "/dashboard";
     } catch (err: any) {
-      setError(err.message ?? "Sign in failed");
+      setError(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -72,7 +105,7 @@ export default function Login() {
           />
         </div> */}
 
-        <h1 className="text-center font-helvetica text-3xl font-semibold text-white">
+        <h1 className="font-helvetica text-center text-3xl font-semibold text-white">
           Welcome Back!
         </h1>
 
@@ -89,7 +122,7 @@ export default function Login() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-12 w-full rounded-xl font-light bg-gray-100 pr-4 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
+              className="h-12 w-full rounded-xl bg-gray-100 pr-4 pl-11 text-sm font-light text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
             />
             <span className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400">
               <Mail size={18} />
@@ -102,7 +135,7 @@ export default function Login() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-12 w-full rounded-xl bg-gray-100 pr-12 pl-11 font-light text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
+              className="h-12 w-full rounded-xl bg-gray-100 pr-12 pl-11 text-sm font-light text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
             />
 
             <span className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400">
@@ -130,12 +163,12 @@ export default function Login() {
             Remember me
           </label>
 
-          <button
-            type="button"
+          <Link
+            href="/forgot-password"
             className="text-sm font-light text-white/70 hover:underline"
           >
             Forgot password?
-          </button>
+          </Link>
         </div>
 
         <button

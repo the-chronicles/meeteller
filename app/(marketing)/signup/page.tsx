@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { supabase } from "@/lib/supabase/browser";
+// import { supabase } from "@/lib/supabase/browser";
+import { signup } from "@/services/auth.service";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -16,48 +17,77 @@ export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
-  const signInWithGoogle = async () => {
-    setError(null);
+  // const signInWithGoogle = async () => {
+  //   setError(null);
 
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${location.origin}/auth/callback`,
-      },
-    });
+  //   await supabase.auth.signInWithOAuth({
+  //     provider: "google",
+  //     options: {
+  //       redirectTo: `${location.origin}/auth/callback`,
+  //     },
+  //   });
+  // };
+
+  const signInWithGoogle = async () => {
+    window.location.href = process.env.NEXT_PUBLIC_BASE_URL + "/auth/google";
   };
+
+  // const signInWithMicrosoft = async () => {
+  //   setError(null);
+
+  //   await supabase.auth.signInWithOAuth({
+  //     provider: "azure",
+  //     options: {
+  //       redirectTo: `${location.origin}/auth/callback`,
+  //     },
+  //   });
+  // };
 
   const signInWithMicrosoft = async () => {
-    setError(null);
-
-    await supabase.auth.signInWithOAuth({
-      provider: "azure",
-      options: {
-        redirectTo: `${location.origin}/auth/callback`,
-      },
-    });
+    alert("Microsoft auth coming soon");
   };
+
+  // const signUpWithEmail = async (email: string, password: string) => {
+  //   setLoading(true);
+  //   setError(null);
+  //   setMessage(null);
+  //   try {
+  //     const { error } = await supabase.auth.signUp({
+  //       email,
+  //       password,
+  //       options: {
+  //         emailRedirectTo: "http://localhost:3000/auth/callback",
+  //       },
+  //     });
+
+  //     if (error) {
+  //       setError(error.message);
+  //     } else {
+  //       setMessage("Check your email for a confirmation link (if required).");
+  //     }
+  //   } catch (err: any) {
+  //     setError(err.message ?? "Sign up failed");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const signUpWithEmail = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
-    setMessage(null);
+
     try {
-      const { error } = await supabase.auth.signUp({
+      const result = await signup({
+        name: "Chronicles",
         email,
         password,
-        options: {
-          emailRedirectTo: "http://localhost:3000/auth/callback",
-        },
       });
 
-      if (error) {
-        setError(error.message);
-      } else {
-        setMessage("Check your email for a confirmation link (if required).");
-      }
+      localStorage.setItem("access_token", result.access_token);
+
+      window.location.href = "/dashboard";
     } catch (err: any) {
-      setError(err.message ?? "Sign up failed");
+      setError(err.response?.data?.message || "Signup failed");
     } finally {
       setLoading(false);
     }
@@ -87,7 +117,7 @@ export default function Signup() {
           />
         </div> */}
 
-        <h1 className="text-center font-helvetica text-3xl font-semibold text-white">
+        <h1 className="font-helvetica text-center text-3xl font-semibold text-white">
           Create your account
         </h1>
 
@@ -120,7 +150,7 @@ export default function Signup() {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="h-12 w-full font-light rounded-xl bg-gray-100 pr-4 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
+              className="h-12 w-full rounded-xl bg-gray-100 pr-4 pl-11 text-sm font-light text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
             />
             <span className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400">
               <Mail size={18} />
@@ -133,7 +163,7 @@ export default function Signup() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="h-12 w-full rounded-xl font-light bg-gray-100 pr-12 pl-11 text-sm text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
+              className="h-12 w-full rounded-xl bg-gray-100 pr-12 pl-11 text-sm font-light text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-black focus:outline-none"
             />
 
             <span className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-400">
@@ -155,7 +185,7 @@ export default function Signup() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 font-light rounded border-gray-300 text-black focus:ring-black"
+                className="h-4 w-4 rounded border-gray-300 font-light text-black focus:ring-black"
               />
               Remember me
             </label>
