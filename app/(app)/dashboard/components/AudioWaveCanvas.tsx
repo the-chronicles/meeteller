@@ -10,6 +10,8 @@ export function AudioWaveCanvas() {
     const ctx = canvas.getContext("2d")!;
     let t = 0;
 
+    let animationFrameId: number;
+
     const resize = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
@@ -24,7 +26,7 @@ export function AudioWaveCanvas() {
       ctx.lineWidth = 2;
       ctx.beginPath();
 
-      for (let x = 0; x < canvas.width; x++) {
+      for (let x = 0; x < canvas.width; x += 5) {
         const y =
           canvas.height / 2 +
           Math.sin(x * 0.02 + t) *
@@ -35,11 +37,14 @@ export function AudioWaveCanvas() {
 
       ctx.stroke();
       t += 0.04 * mood.speed;
-      requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
     };
 
     animate();
-    return () => window.removeEventListener("resize", resize);
+    return () => {
+      window.removeEventListener("resize", resize);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, [mood]);
 
   return (

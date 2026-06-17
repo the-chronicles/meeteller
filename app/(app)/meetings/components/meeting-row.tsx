@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Loader2 } from "lucide-react";
-import type { Meeting } from "../page";
+import { CheckCircle2, Loader2, Pencil } from "lucide-react";
+import { Meeting } from "@/app/types/meeting";
 
 function pad2(n: number) {
   return String(n).padStart(2, "0");
@@ -24,21 +24,27 @@ function relativeDayLabel(d: Date) {
   return d.toLocaleDateString(undefined, { weekday: "short" }).toUpperCase();
 }
 
-function durationLabel(mins: number) {
-  if (mins < 60) return `${mins} min`;
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  return m ? `${h} hr ${m} min` : `${h} hr`;
-}
+export function MeetingRow({
+  meeting,
+  onEdit,
+}: {
+  meeting: Meeting;
 
-export function MeetingRow({ meeting }: { meeting: Meeting }) {
+  onEdit?: (meeting: Meeting) => void;
+}) {
   const isProcessing = meeting.status === "processing";
-  const start = new Date(meeting.startISO);
+
+  const isLive = meeting.status === "live";
+
+  const isScheduled = meeting.status === "scheduled";
+  const start = meeting.startedAt
+    ? new Date(meeting.startedAt)
+    : new Date(meeting.createdAt);
 
   return (
     <Link
       href={`/meetings/${meeting.id}`}
-      className="group block rounded-2xl border bg-white p-4 transition hover:bg-gray-50 dark:bg-[#0a0014] dark:hover:bg-white/5"
+      className="group block rounded-2xl border border-gray-200 bg-white p-4 transition hover:bg-gray-50 dark:border-white/10 dark:bg-[#0a0014] dark:hover:bg-white/5"
     >
       <div className="flex gap-4">
         {/* Left date/time box */}
@@ -59,25 +65,39 @@ export function MeetingRow({ meeting }: { meeting: Meeting }) {
                 {meeting.title}
               </h3>
               <p className="mt-1 line-clamp-1 text-sm text-gray-500 dark:text-gray-400">
-                {meeting.summary ||
+                {meeting.description ||
                   "Meeting recording and transcript processing."}
-              </p>
-
-              {/* Duration under (like screenshot) */}
-              <p className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                Duration:{" "}
-                <span className="font-semibold">
-                  {durationLabel(meeting.durationMin)}
-                </span>
               </p>
             </div>
 
             {/* Status pill (right) */}
-            <div className="shrink-0">
+            <div className="flex shrink-0 items-center gap-2">
+              {onEdit && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    onEdit(meeting);
+                  }}
+                  className="rounded-lg border border-gray-200 p-2 transition hover:bg-gray-100 dark:border-white/10 dark:hover:bg-white/10"
+                >
+                  <Pencil size={14} />
+                </button>
+              )}
+
               {isProcessing ? (
-                <span className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-2 text-xs font-medium text-gray-700 shadow-sm dark:bg-[#0a0014] dark:text-gray-200">
+                <span className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 text-xs font-medium text-gray-700 shadow-sm dark:border-white/10 dark:bg-[#0a0014] dark:text-gray-200">
                   <Loader2 size={14} className="animate-spin text-gray-400" />
                   Processing
+                </span>
+              ) : isLive ? (
+                <span className="inline-flex items-center gap-2 rounded-full bg-red-600 px-3 py-2 text-xs font-medium text-white shadow-sm">
+                  Live
+                </span>
+              ) : isScheduled ? (
+                <span className="inline-flex items-center gap-2 rounded-full bg-amber-500 px-3 py-2 text-xs font-medium text-white shadow-sm">
+                  Scheduled
                 </span>
               ) : (
                 <span className="inline-flex items-center gap-2 rounded-full bg-green-600 px-3 py-2 text-xs font-medium text-white shadow-sm">

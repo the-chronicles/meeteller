@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
 import { Mail, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -44,7 +45,7 @@ export default function Signup() {
   // };
 
   const signInWithMicrosoft = async () => {
-    alert("Microsoft auth coming soon");
+    toast.info("Microsoft sign in is coming soon.");
   };
 
   // const signUpWithEmail = async (email: string, password: string) => {
@@ -87,7 +88,10 @@ export default function Signup() {
 
       window.location.href = "/dashboard";
     } catch (err: any) {
-      setError(err.response?.data?.message || "Signup failed");
+      const message = err.response?.data?.message || "Signup failed";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -255,7 +259,7 @@ export default function Signup() {
           </button>
         </div>
 
-        <p className="mt-6 text-center text-sm text-[#8c8b8b]">
+        {/* <p className="mt-6 text-center text-sm text-[#8c8b8b]">
           Already have an account?{" "}
           <Link
             href="/login"
@@ -263,7 +267,7 @@ export default function Signup() {
           >
             Sign In
           </Link>
-        </p>
+        </p> */}
       </div>
     </div>
   );

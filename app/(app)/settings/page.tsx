@@ -45,27 +45,27 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto container max-w-5xl px-4 py-2">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold">Settings</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Settings</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Manage your account, billing, and application preferences.
         </p>
       </div>
 
-      <div className="border-b border-gray-200">
-        <nav className="flex gap-8">
+      <div className="border-b border-gray-200 dark:border-white/10">
+        <nav className="flex gap-8 overflow-x-auto whitespace-nowrap scrollbar-none">
           {SETTINGS_TABS.map((tab) => (
             <button
               key={tab.key}
               onClick={() => handleTabChange(tab.key)}
               className={`relative pb-3 text-sm font-medium transition ${
                 activeTab === tab.key
-                  ? "text-black"
-                  : "text-gray-500 hover:text-black"
+                  ? "text-black dark:text-white"
+                  : "text-gray-500 hover:text-black dark:hover:text-white"
               }`}
             >
               {tab.label}
               {activeTab === tab.key && (
-                <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-black" />
+                <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-black dark:bg-white" />
               )}
             </button>
           ))}

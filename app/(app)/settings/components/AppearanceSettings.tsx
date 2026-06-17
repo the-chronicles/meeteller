@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { HexColorPicker } from "react-colorful";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import { useUISettings } from "@/context/UISettingsProvider";
 import { SOLID_COLORS, GRADIENTS, DEFAULT_IMAGES } from "../constants";
 
@@ -42,13 +43,17 @@ export default function AppearanceSettings() {
 
   const handleImageUpload = (file: File) => {
     if (file.size > 2_000_000) {
-      alert("Image too large (max 2MB)");
+      toast.error("Image too large. Maximum file size is 2MB.");
       return;
     }
 
     const reader = new FileReader();
     reader.onload = () => {
       saveRecentImage(reader.result as string);
+      toast.success("Background image updated.");
+    };
+    reader.onerror = () => {
+      toast.error("Unable to read this image.");
     };
     reader.readAsDataURL(file);
   };

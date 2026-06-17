@@ -1,12 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useContext, useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, Download } from "lucide-react";
+import { toast } from "sonner";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { payWithPaystack } from "@/utils/paystack";
-// import { useUser } from "@/context/UserProvider";
-import { AuthContext } from "@/context/auth-context";
+import { useAuth } from "@/hooks/useAuth";
+import api from "@/lib/api";
 
 type BillingCycle = "monthly" | "yearly";
 
@@ -65,79 +65,107 @@ const PLANS = [
   },
 ];
 
-const INVOICES = [
-  "Invoice_March_2025",
-  "Invoice_February_2025",
-  "Invoice_January_2025",
-  "Invoice_December_2024",
-];
+type Plan = (typeof PLANS)[number];
 
 export default function BillingSettings() {
   const [selectedInvoice, setSelectedInvoice] = useState<string | null>(null);
-
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [loadingInvoices, setLoadingInvoices] = useState(true);
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly");
+
+  const { user, refreshUser } = useAuth();
+
+  const fetchInvoices = async () => {
+    try {
+      const response = await api.get("/billing/history");
+      setInvoices(response.data);
+    } catch (err) {
+      console.error("Failed to load invoice history:", err);
+    } finally {
+      setLoadingInvoices(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchInvoices();
+    }
+  }, [user]);
 
   const formatPrice = (amount: number) => amount.toLocaleString("en-NG");
 
-  const handleDownload = (invoice: string) => {
+  const getBackendBaseUrl = () => {
+    return process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001/";
+  };
+
+  const handleDownload = (invoiceNumber: string) => {
     const link = document.createElement("a");
-    link.href = `/invoices/${invoice}.pdf`; // 👈 update to your backend route
-    link.download = `${invoice}.pdf`;
+    link.href = `${getBackendBaseUrl()}invoices/${invoiceNumber}.pdf`;
+    link.download = `${invoiceNumber}.pdf`;
+    link.target = "_blank";
     link.click();
   };
 
-  // const handleSubscribe = (planId: string) => {
-  //   console.log("Subscribing to:", planId, billingCycle);
-  //   // 👉 Hook this to Paystack / Stripe
-  //   // router.push(`/checkout?plan=${planId}&cycle=${billingCycle}`)
-  // };
-
-  // const { user } = useUser();
-  const auth = useContext(AuthContext);
-
-  const user = auth?.user;
-
-  const handleSubscribe = (plan: any) => {
+  const handleSubscribe = (plan: Plan) => {
     if (!plan?.prices?.[billingCycle]) {
-      console.error("Invalid plan data:", plan);
+      toast.error("This subscription option is unavailable.");
       return;
     }
 
     if (!user?.email) {
-      console.error("User email is required");
+      toast.error("Add an email address before subscribing.");
       return;
     }
 
-    payWithPaystack({
-      email: user.email,
-      amount: plan.prices[billingCycle] * 100,
+    try {
+      payWithPaystack({
+        email: user.email,
+        amount: plan.prices[billingCycle] * 100,
 
-      onSuccess: () => {
-        console.log("Payment successful");
-      },
+        onSuccess: async (response: any) => {
+          const toastId = toast.loading("Verifying payment, updating your plan...");
+          try {
+            await api.post("/billing/verify", { reference: response.reference });
+            toast.dismiss(toastId);
+            toast.success("Payment successful! Your plan is now active.");
+            await refreshUser();
+            await fetchInvoices();
+          } catch (err) {
+            toast.dismiss(toastId);
+            toast.error("Verification failed. Please contact support.");
+          }
+        },
 
-      onClose: () => {
-        console.log("Payment closed");
-      },
-    });
+        onClose: () => {
+          toast.info("Payment window closed.");
+        },
+      });
+    } catch {
+      toast.error("Unable to start payment. Please try again.");
+    }
   };
+
+  const plansWithCurrent = PLANS.map((plan) => ({
+    ...plan,
+    current: plan.id === (user?.subscriptionPlan || "basic"),
+  }));
 
   return (
     <section className="max-w-6xl space-y-14">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Manage your plan and billing history here.
         </p>
 
         {/* Billing Toggle */}
-        <div className="flex items-center gap-2 rounded-xl border bg-white p-1 text-sm">
+        <div className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-zinc-950 p-1 text-sm">
           <button
             onClick={() => setBillingCycle("monthly")}
             className={`rounded-lg px-3 py-1.5 transition ${
               billingCycle === "monthly"
                 ? "bg-[#5b09c4] text-white"
-                : "text-gray-500 hover:text-black"
+                : "text-gray-500 hover:text-black dark:hover:text-white"
             }`}
           >
             Monthly
@@ -147,7 +175,7 @@ export default function BillingSettings() {
             className={`rounded-lg px-3 py-1.5 transition ${
               billingCycle === "yearly"
                 ? "bg-[#5b09c4] text-white"
-                : "text-gray-500 hover:text-black"
+                : "text-gray-500 hover:text-black dark:hover:text-white"
             }`}
           >
             Yearly
@@ -157,14 +185,16 @@ export default function BillingSettings() {
 
       {/* Plans */}
       <div className="grid gap-6 md:grid-cols-3">
-        {PLANS.map((plan) => {
+        {plansWithCurrent.map((plan) => {
           const price = plan.prices[billingCycle];
 
           return (
             <div
               key={plan.id}
-              className={`rounded-2xl border p-7 ${
-                plan.featured ? "border-[#5b09c4] bg-[#5b09c4]/10" : "bg-white"
+              className={`rounded-2xl border p-7 transition ${
+                plan.featured
+                  ? "border-[#5b09c4] bg-[#5b09c4]/10 dark:bg-[#5b09c4]/20"
+                  : "bg-white dark:bg-zinc-900 border-gray-200 dark:border-white/10"
               }`}
             >
               {/* Title */}
@@ -172,7 +202,7 @@ export default function BillingSettings() {
                 <h3 className="font-helvetica text-lg font-semibold">
                   {plan.name}
                 </h3>
-                <p className="text-sm text-gray-500">{plan.subtitle}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{plan.subtitle}</p>
               </div>
 
               {/* Price */}
@@ -183,7 +213,7 @@ export default function BillingSettings() {
                   </span>
                 </div>
 
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   {billingCycle === "monthly"
                     ? "Billed per month"
                     : "Billed yearly"}
@@ -198,7 +228,7 @@ export default function BillingSettings() {
 
               {/* Discount */}
               {!plan.current && billingCycle === "yearly" && (
-                <span className="font-medium">
+                <span className="text-xs font-medium text-[#5b09c4] dark:text-purple-400 block mt-2">
                   {plan.id === "personal" && "Save 10% with yearly billing"}
                   {plan.id === "teams" && "Save 15% with yearly billing"}
                 </span>
@@ -209,7 +239,7 @@ export default function BillingSettings() {
                 {plan.current ? (
                   <button
                     disabled
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border bg-gray-100 px-4 py-3 text-sm font-medium text-gray-600"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-100 px-4 py-3 text-sm font-medium text-gray-600 dark:bg-zinc-800 dark:text-gray-400 dark:border-white/10"
                   >
                     <Check size={16} />
                     Current plan
@@ -219,8 +249,8 @@ export default function BillingSettings() {
                     onClick={() => handleSubscribe(plan)}
                     className={`w-full rounded-xl px-4 py-3 text-sm font-medium transition ${
                       plan.featured
-                        ? "bg-black text-white hover:bg-black/90"
-                        : "border bg-white hover:bg-gray-50"
+                        ? "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
+                        : "border border-gray-200 bg-white hover:bg-gray-50 dark:border-white/10 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700"
                     }`}
                   >
                     Start Subscription
@@ -233,9 +263,9 @@ export default function BillingSettings() {
                 {plan.features.map((feature) => (
                   <li
                     key={feature}
-                    className="flex items-center gap-3 text-gray-700"
+                    className="flex items-center gap-3 text-gray-700 dark:text-gray-300"
                   >
-                    <Check className="h-4 w-4 text-gray-500" />
+                    <Check className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                     {feature}
                   </li>
                 ))}
@@ -249,45 +279,65 @@ export default function BillingSettings() {
       <div className="space-y-4">
         <h3 className="text-sm font-medium">
           Billing history{" "}
-          <span className="text-gray-400">{INVOICES.length}</span>
+          <span className="text-gray-400">{invoices.length}</span>
         </h3>
 
-        <div className="rounded-xl border bg-white">
-          {INVOICES.map((invoice, index) => (
-            <div
-              key={invoice}
-              className={`flex items-center gap-3 px-4 py-3 text-sm hover:bg-gray-50 ${
-                index !== INVOICES.length - 1 ? "border-b" : ""
-              }`}
-            >
-              <div className="flex flex-1 items-center gap-3">
-                <span className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                  PDF
-                </span>
-                <span>{invoice}</span>
-              </div>
+        <div className="rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-zinc-900">
+          {loadingInvoices ? (
+            <div className="px-5 py-4 text-sm text-gray-500 text-center">Loading invoices...</div>
+          ) : invoices.length === 0 ? (
+            <div className="px-5 py-4 text-sm text-gray-500 text-center">No payment receipts available.</div>
+          ) : (
+            invoices.map((invoice, index) => {
+              const formattedDate = new Date(invoice.createdAt).toLocaleDateString("en-NG", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+              const invoiceLabel = `Receipt_${invoice.planId}_${invoice.billingCycle}_${invoice.invoiceNumber}`;
+              return (
+                <div
+                  key={invoice.id}
+                  onClick={() => setSelectedInvoice(invoice.invoiceNumber)}
+                  className={`flex items-center gap-3 px-4 py-3 text-sm cursor-pointer hover:bg-gray-50 dark:hover:bg-white/5 ${
+                    index !== invoices.length - 1 ? "border-b border-gray-100 dark:border-white/10" : ""
+                  }`}
+                >
+                  <div className="flex flex-1 items-center gap-3">
+                    <span className="rounded bg-gray-100 dark:bg-white/10 px-2 py-1 text-xs font-medium text-gray-600 dark:text-gray-300">
+                      PDF
+                    </span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-900 dark:text-white">{invoiceLabel}</span>
+                      <span className="text-xs text-gray-400">{formattedDate}</span>
+                    </div>
+                  </div>
 
-              <button
-                // onClick={() => handleDownload(invoice)}
-                onClick={() => setSelectedInvoice(invoice)}
-                className="rounded-lg p-2 transition hover:bg-gray-200"
-              >
-                <Download className="h-4 w-4 text-gray-600" />
-              </button>
-            </div>
-          ))}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDownload(invoice.invoiceNumber);
+                    }}
+                    className="rounded-lg p-2 transition hover:bg-gray-200 dark:hover:bg-white/10"
+                  >
+                    <Download className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                  </button>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 
       {selectedInvoice && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-[90%] max-w-3xl rounded-xl bg-white p-4">
+          <div className="w-[90%] max-w-3xl rounded-xl border border-gray-200 bg-white p-4 shadow-xl dark:border-white/10 dark:bg-zinc-900">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-medium">{selectedInvoice}</h3>
+              <h3 className="font-medium text-gray-900 dark:text-white">Invoice Receipt {selectedInvoice}</h3>
 
               <button
                 onClick={() => setSelectedInvoice(null)}
-                className="text-sm text-gray-500"
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white"
               >
                 Close
               </button>
@@ -295,26 +345,25 @@ export default function BillingSettings() {
 
             {/* PDF Preview */}
             <iframe
-              src={`/invoices/${selectedInvoice}.pdf`}
-              className="h-[400px] w-full rounded-lg border"
+              src={`${getBackendBaseUrl()}invoices/${selectedInvoice}.pdf`}
+              className="h-[400px] w-full rounded-lg border border-gray-200 dark:border-white/10"
             />
 
             {/* Actions */}
             <div className="mt-4 flex justify-end gap-3">
               <button
                 onClick={() => setSelectedInvoice(null)}
-                className="px-4 py-2 text-sm"
+                className="px-4 py-2 text-sm hover:bg-gray-50 dark:hover:bg-white/5 rounded-lg"
               >
                 Cancel
               </button>
 
-              <a
-                href={`/invoices/${selectedInvoice}.pdf`}
-                download
-                className="rounded-lg bg-black px-4 py-2 text-sm text-white"
+              <button
+                onClick={() => handleDownload(selectedInvoice)}
+                className="rounded-lg bg-black px-4 py-2 text-sm text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
               >
                 Download
-              </a>
+              </button>
             </div>
           </div>
         </div>

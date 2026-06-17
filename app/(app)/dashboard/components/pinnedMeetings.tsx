@@ -59,10 +59,10 @@ export default function PinnedMeetings() {
               <div className="mt-6 flex items-start gap-3">
                 <Mic size={18} className="text-gray-400" />
                 <div>
-                  <p className="font-medium md:text-xs lg:text-[12px]">
+                  <p className="font-medium md:text-xs lg:text-[12px] text-gray-900 dark:text-white">
                     {m.title}
                   </p>
-                  <p className="text-gray-600 md:text-xs lg:text-[12px]">
+                  <p className="text-gray-600 dark:text-gray-400 md:text-xs lg:text-[12px]">
                     {m.date}
                   </p>
                 </div>

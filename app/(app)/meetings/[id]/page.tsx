@@ -1,91 +1,94 @@
 "use client";
 
-import { useMemo } from "react";
-import { MeetingHeader } from "./components/meeting-header";
+import { useParams } from "next/navigation";
+
+import AppLoader from "@/components/ui/AppLoader";
+
+// import { useMeeting } from "@/hooks/useMeeting";
+
 import { AudioPlayer } from "./components/audio-player";
+
+import { MeetingHeader } from "./components/meeting-header";
+
 import { SummaryPanel } from "./components/summary-panel";
+
 import { TasksPanel } from "./components/tasks-panel";
+
 import { TranscriptPanel } from "./components/transcript-panel";
+import { useMeeting } from "@/hooks/useMeetings";
 
 export default function MeetingDetailPage() {
-  // later: fetch by id from route params
-  const meeting = useMemo(
-    () => ({
-      id: "1",
-      title: "Meeting Summary",
-      subtitle: "Key takeaways and action items from the latest team meeting.",
-      meetingName: "Product Sync Meeting",
-      dateLabel: "December 16, 2025",
-      durationLabel: "45 minutes",
-      topic: "Q3 Planning and Goal Setting",
-      objectives:
-        "Discuss and finalize Q3 goals, assign responsibilities, and identify potential roadblocks.",
-      decisions: [
-        "Increase monthly active users by 15%",
-        "Launch new feature X by end of Q3",
-        "Hire 2 additional engineers to support development",
-      ],
-      attendees: [
-        { name: "John Doe", avatar: "/avatars/1.png" },
-        { name: "Jane Smith", avatar: "/avatars/2.png" },
-        { name: "Michael Johnson", avatar: "/avatars/3.png" },
-        { name: "Emily Davis", avatar: "/avatars/4.png" },
-      ],
-      summary:
-        "The council reviewed and adopted the 2025 financial plan, including operating and capital budgets. Concerns were raised regarding public engagement and a projected 17–21% tax increase following reassessment. Council emphasized fiscal responsibility while planning for long-term infrastructure needs.",
-      actionItems: [
-        {
-          id: "t1",
-          title: "Improve onboarding flow",
-          assignee: "Jane Smith",
-          dueISO: "2026-03-15",
-          status: "Completed" as const,
-        },
-        {
-          id: "t2",
-          title: "Optimize search algorithm",
-          assignee: "Michael Johnson",
-          dueISO: "2026-04-01",
-          status: "In Progress" as const,
-        },
-        {
-          id: "t3",
-          title: "Implement reporting dashboard",
-          assignee: "Emily Davis",
-          dueISO: "2026-04-30",
-          status: "Not Started" as const,
-        },
-      ],
-      transcript: [
-        { speaker: "Mayor", text: "This is the special meeting to discuss the 2025 financial plan..." },
-        { speaker: "Councillor Miller", text: "I have concerns regarding public engagement and rising tax rates..." },
-      ],
-    }),
-    [],
-  );
+  const params = useParams();
+
+  const id = params.id as string;
+
+  const { data: meeting, isLoading } = useMeeting(id);
+
+  if (isLoading) {
+    return <AppLoader />;
+  }
+
+  if (!meeting) {
+    return <div className="p-6">Meeting not found.</div>;
+  }
 
   return (
-    <div className="min-h-screen bg-[#F6F8FB] p-6 dark:bg-black">
+    <div className="space-y-4 p-2 bg-transparent">
       <div className="mx-auto max-w-4xl space-y-4">
-        <MeetingHeader meeting={meeting} />
+        <MeetingHeader
+          meeting={{
+            id: String(meeting.id),
 
-        {/* keep your intent: playback stays */}
+            title: meeting.title,
+
+            subtitle: meeting.description || "Meeting details",
+
+            meetingName: meeting.title,
+
+            dateLabel: new Date(meeting.createdAt).toLocaleDateString(),
+
+            durationLabel: meeting.isLive ? "Live" : meeting.status,
+          }}
+        />
+
         <AudioPlayer />
 
-        {/* MAIN CARD like screenshot */}
         <div
           id="meeting-summary"
-          className="rounded-2xl border bg-white p-6 shadow-sm dark:bg-[#0a0014]"
+          className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#0a0014]"
         >
-          <SummaryPanel meeting={meeting} />
+          <SummaryPanel
+            meeting={{
+              meetingName: meeting.title,
 
-          <div className="mt-6 border-t pt-6">
-            <TasksPanel items={meeting.actionItems} />
+              dateLabel: new Date(meeting.createdAt).toLocaleDateString(),
+
+              durationLabel: meeting.status,
+
+              topic: meeting.title,
+
+              attendees: [
+                {
+                  name: meeting.owner?.name || "Unknown",
+
+                  avatar: meeting.owner?.picture || "/avatar.png",
+                },
+              ],
+
+              objectives: meeting.description || "No objectives provided.",
+
+              decisions: [],
+
+              summary: meeting.description || "No summary yet.",
+            }}
+          />
+
+          <div className="mt-6 border-t border-gray-200 dark:border-white/10 pt-6">
+            <TasksPanel items={[]} />
           </div>
         </div>
 
-        {/* Transcript as separate panel below (still consistent) */}
-        <TranscriptPanel transcript={meeting.transcript} />
+        <TranscriptPanel transcript={[]} />
       </div>
     </div>
   );

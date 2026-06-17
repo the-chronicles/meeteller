@@ -18,6 +18,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 type TeamRole = "Admin" | "Member";
 
@@ -69,9 +70,9 @@ const teamFeatures = [
 ];
 
 export default function TeamsPage() {
-    const router = useRouter();
+  const router = useRouter();
   const hasTeamsAccess = true;
-//   const hasTeamsAccess = false;
+  //   const hasTeamsAccess = false;
 
   const [inviteOpen, setInviteOpen] = useState(false);
   const [invites, setInvites] = useState<Invitation[]>([
@@ -102,11 +103,14 @@ export default function TeamsPage() {
       ...prev,
     ]);
     setInviteOpen(false);
+    toast.success(`Invitation sent to ${invite.email}.`);
   };
 
   if (!hasTeamsAccess) {
-  return <LockedTeamsView onUpgrade={() => router.push("/settings?tab=billing")} />;
-}
+    return (
+      <LockedTeamsView onUpgrade={() => router.push("/settings?tab=billing")} />
+    );
+  }
 
   return (
     <>
@@ -173,7 +177,7 @@ export default function TeamsPage() {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-3">
-          <section className="rounded-2xl border bg-white p-5 shadow-sm dark:bg-[#0a0014] xl:col-span-1">
+          <section className="rounded-2xl border bg-white p-5 shadow-sm xl:col-span-1 dark:bg-[#0a0014]">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-base font-semibold text-gray-900 dark:text-white">
@@ -231,7 +235,7 @@ export default function TeamsPage() {
             </div>
           </section>
 
-          <section className="rounded-2xl border bg-white p-5 shadow-sm dark:bg-[#0a0014] xl:col-span-2">
+          <section className="rounded-2xl border bg-white p-5 shadow-sm xl:col-span-2 dark:bg-[#0a0014]">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-base font-semibold text-gray-900 dark:text-white">

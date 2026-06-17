@@ -2,6 +2,11 @@
 
 import { useMemo, useRef, useState } from "react";
 import { Share2, Link as LinkIcon, FileDown, X } from "lucide-react";
+import { toast } from "sonner";
+
+import { Trash2 } from "lucide-react";
+
+import { useDeleteMeeting } from "@/hooks/useDeleteMeeting";
 
 type Meeting = {
   id: string;
@@ -22,9 +27,17 @@ export function MeetingHeader({ meeting }: { meeting: Meeting }) {
     return window.location.href;
   }, []);
 
+  const { mutate: deleteMeeting, isPending: deletingMeeting } =
+    useDeleteMeeting();
+
   const copyLink = async () => {
-    await navigator.clipboard.writeText(shareUrl);
-    setOpen(false);
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setOpen(false);
+      toast.success("Meeting link copied.");
+    } catch {
+      toast.error("Unable to copy the meeting link.");
+    }
   };
 
   async function exportPDFBlob(): Promise<Blob> {
@@ -70,45 +83,48 @@ export function MeetingHeader({ meeting }: { meeting: Meeting }) {
   }
 
   const downloadPDF = async () => {
-  try {
-    setBusy("pdf");
+    try {
+      setBusy("pdf");
 
-    const blob = await exportPDFBlob();
+      const blob = await exportPDFBlob();
 
-    // If html2canvas produced something invalid/empty
-    if (!blob || blob.size === 0) {
-      throw new Error("Generated PDF is empty. Check CORS/tainted canvas issues.");
+      // If html2canvas produced something invalid/empty
+      if (!blob || blob.size === 0) {
+        throw new Error(
+          "Generated PDF is empty. Check CORS/tainted canvas issues.",
+        );
+      }
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+
+      // Avoid replaceAll() issues on older Safari
+      const safeName = (meeting.meetingName || "meeting")
+        .trim()
+        .replace(/\s+/g, "_")
+        .replace(/[^\w\-]+/g, "");
+
+      a.download = `${safeName}_summary.pdf`;
+      a.style.display = "none";
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      // Give the browser time to start the download before revoking
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+
+      setOpen(false);
+      toast.success("Meeting summary downloaded.");
+    } catch (e) {
+      console.error("PDF download failed:", e);
+      toast.error("Unable to download the meeting summary.");
+    } finally {
+      setBusy(null);
     }
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-
-    // Avoid replaceAll() issues on older Safari
-    const safeName = (meeting.meetingName || "meeting")
-      .trim()
-      .replace(/\s+/g, "_")
-      .replace(/[^\w\-]+/g, "");
-
-    a.download = `${safeName}_summary.pdf`;
-    a.style.display = "none";
-
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-
-    // Give the browser time to start the download before revoking
-    setTimeout(() => URL.revokeObjectURL(url), 10_000);
-
-    setOpen(false);
-  } catch (e) {
-    console.error("PDF download failed:", e);
-    // optional: show a toast/snackbar here
-  } finally {
-    setBusy(null);
-  }
-};
+  };
 
   const shareNative = async () => {
     try {
@@ -130,6 +146,7 @@ export function MeetingHeader({ meeting }: { meeting: Meeting }) {
         if (navigator.canShare?.({ files: [file] })) {
           await navigator.share({ ...baseData, files: [file] });
           setOpen(false);
+          toast.success("Meeting shared.");
           return;
         }
       } catch {
@@ -139,16 +156,21 @@ export function MeetingHeader({ meeting }: { meeting: Meeting }) {
       if (navigator.share) {
         await navigator.share(baseData);
         setOpen(false);
+        toast.success("Meeting shared.");
       } else {
         await copyLink();
       }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return;
+
+      toast.error("Unable to share this meeting.");
     } finally {
       setBusy(null);
     }
   };
 
   return (
-    <div className="rounded-2xl border bg-white p-5 shadow-sm dark:bg-[#0a0014]">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0a0014]">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
@@ -159,17 +181,27 @@ export function MeetingHeader({ meeting }: { meeting: Meeting }) {
           </p>
         </div>
 
-        <div className="relative" ref={panelRef}>
+        <div className="relative flex items-center gap-2" ref={panelRef}>
           <button
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:bg-gray-50 dark:bg-[#0a0014] dark:hover:bg-white/5"
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium hover:bg-gray-50 dark:bg-[#0a0014] dark:border-white/10 dark:text-white dark:hover:bg-white/5"
           >
             <Share2 size={16} />
             Share
           </button>
 
+          <button
+            onClick={() => deleteMeeting(meeting.id)}
+            disabled={deletingMeeting}
+            className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60 dark:hover:bg-red-500/10"
+          >
+            <Trash2 size={16} />
+
+            {deletingMeeting ? "Deleting..." : "Delete"}
+          </button>
+
           {open && (
-            <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border bg-white shadow-lg dark:bg-[#0a0014]">
+            <div className="absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg dark:border-white/10 dark:bg-[#0a0014]">
               <div className="flex items-center justify-between px-3 py-2 text-xs text-gray-500 dark:text-gray-400">
                 Share options
                 <button
@@ -183,7 +215,7 @@ export function MeetingHeader({ meeting }: { meeting: Meeting }) {
               <button
                 onClick={shareNative}
                 disabled={busy !== null}
-                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-60 dark:hover:bg-white/5"
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-60 dark:hover:bg-white/5 dark:text-white"
               >
                 <Share2 size={16} />
                 {busy === "share" ? "Sharing..." : "Share (native)"}
@@ -191,7 +223,7 @@ export function MeetingHeader({ meeting }: { meeting: Meeting }) {
 
               <button
                 onClick={copyLink}
-                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-white/5"
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-white/5 dark:text-white"
               >
                 <LinkIcon size={16} />
                 Copy link
@@ -200,7 +232,7 @@ export function MeetingHeader({ meeting }: { meeting: Meeting }) {
               <button
                 onClick={downloadPDF}
                 disabled={busy !== null}
-                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-60 dark:hover:bg-white/5"
+                className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 disabled:opacity-60 dark:hover:bg-white/5 dark:text-white"
               >
                 <FileDown size={16} />
                 {busy === "pdf" ? "Generating PDF..." : "Download PDF"}

@@ -20,20 +20,25 @@ export function TypingNotes() {
     let i = 0;
     const current = notes[noteIndex];
 
+    let timeoutId: NodeJS.Timeout;
+
     const interval = setInterval(() => {
       setText(current.slice(0, i));
       i++;
 
       if (i > current.length) {
         clearInterval(interval);
-        setTimeout(() => {
+        timeoutId = setTimeout(() => {
           setText("");
           setNoteIndex((prev) => (prev + 1) % notes.length);
         }, 1200);
       }
     }, 80 / mood.speed);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [noteIndex, mood.speed]);
 
   return (

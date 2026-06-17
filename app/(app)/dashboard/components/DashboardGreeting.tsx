@@ -3,14 +3,12 @@ import { TypingNotes } from "./TypingNotes";
 import { AudioWaveCanvas } from "./AudioWaveCanvas";
 // import { useUser } from "@/context/UserProvider";
 import { useDayMood } from "@/hooks/useDayMood";
-import { AuthContext } from "@/context/auth-context";
-import { useContext } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function DashboardGreeting() {
-  const auth = useContext(AuthContext);
-
-  const user = auth?.user;
+  const { user } = useAuth();
   const mood = useDayMood();
+  const displayName = user?.name?.trim() || user?.email?.split("@")[0];
 
   const greeting =
     mood.label === "morning"
@@ -20,15 +18,15 @@ export function DashboardGreeting() {
         : "Good evening";
 
   return (
-    <div className="relative overflow-hidden bg-white p-30 backdrop-blur-xl dark:bg-black">
-      <AudioWaveCanvas />
+    <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white/40 p-8 backdrop-blur-xl md:p-40 dark:border-white/10 dark:bg-[#0a0014]/40">
+      {/* <AudioWaveCanvas /> */}
 
       <div className="relative z-10 space-y-4 text-center">
-        <h2 className="font-helvetica sm: 6xl font-bold text-gray-900 md:text-5xl lg:text-4xl dark:text-white">
+        <h2 className="font-helvetica text-2xl font-bold text-gray-900 sm:text-4xl dark:text-white">
           {greeting},
-          {user?.email && (
+          {displayName && (
             <span className="text-gray-500 dark:text-gray-400">
-              {` ${user.email.split("@")[0]}`}
+              {` ${displayName}`}
             </span>
           )}{" "}
           👋

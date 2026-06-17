@@ -1,23 +1,36 @@
+import type { User } from "@/app/types/user";
 import api from "@/lib/api";
 
-export const signup = async (data: {
+type SignupData = {
   name: string;
   email: string;
   password: string;
-}) => {
-  const response = await api.post("/auth/signup", data);
+};
+
+type LoginData = {
+  email: string;
+  password: string;
+};
+
+type AuthResponse = {
+  access_token: string;
+  user?: User;
+};
+
+export const signup = async (data: SignupData): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>("/auth/signup", data);
 
   return response.data;
 };
 
-export const login = async (data: { email: string; password: string }) => {
-  const response = await api.post("/auth/login", data);
+export const login = async (data: LoginData): Promise<AuthResponse> => {
+  const response = await api.post<AuthResponse>("/auth/login", data);
 
   return response.data;
 };
 
-export const getCurrentUser = async () => {
-  const response = await api.get("/auth/me");
+export const getCurrentUser = async (): Promise<User> => {
+  const response = await api.get<User>("/auth/me");
 
   return response.data;
 };

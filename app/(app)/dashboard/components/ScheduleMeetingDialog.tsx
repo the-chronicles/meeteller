@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useEvents, type MeetingPlatform, type CalEvent } from "@/context/EventProvider";
+import {
+  useEvents,
+  type MeetingPlatform,
+  type CalEvent,
+} from "@/context/EventProvider";
+import { toast } from "sonner";
 
 function uid() {
   return Math.random().toString(36).slice(2, 10);
@@ -38,7 +43,10 @@ export function ScheduleMeetingDialog({
   if (!open) return null;
 
   const submit = () => {
-    if (!title.trim()) return;
+    if (!title.trim()) {
+      toast.error("Enter a meeting title.");
+      return;
+    }
 
     const joinUrl = makeMeetLink(platform);
 
@@ -59,6 +67,7 @@ export function ScheduleMeetingDialog({
     addEvent(e);
     onClose();
     setTitle("");
+    toast.success("Meeting scheduled.");
   };
 
   return (
@@ -66,7 +75,10 @@ export function ScheduleMeetingDialog({
       <div className="w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl">
         <div className="flex items-center justify-between">
           <h3 className="text-base font-semibold">Schedule meeting</h3>
-          <button onClick={onClose} className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50">
+          <button
+            onClick={onClose}
+            className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
+          >
             Close
           </button>
         </div>

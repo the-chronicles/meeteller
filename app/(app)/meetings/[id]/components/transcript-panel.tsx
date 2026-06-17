@@ -6,7 +6,7 @@ export function TranscriptPanel({
   transcript: { speaker: string; text: string }[];
 }) {
   return (
-    <div className="rounded-2xl border bg-white p-6 shadow-sm dark:bg-[#0a0014]">
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#0a0014]">
       <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
         Transcript
       </h3>

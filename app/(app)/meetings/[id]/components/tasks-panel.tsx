@@ -4,12 +4,12 @@ type ItemStatus = "Completed" | "In Progress" | "Not Started";
 
 function statusPill(status: ItemStatus) {
   if (status === "Completed") {
-    return "bg-green-50 text-green-700 border-green-200";
+    return "bg-green-50 text-green-700 border-green-200 dark:bg-green-950/20 dark:text-green-400 dark:border-green-900/30";
   }
   if (status === "In Progress") {
-    return "bg-amber-50 text-amber-700 border-amber-200";
+    return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30";
   }
-  return "bg-red-50 text-red-700 border-red-200";
+  return "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/20 dark:text-red-400 dark:border-red-900/30";
 }
 
 export function TasksPanel({
@@ -33,7 +33,7 @@ export function TasksPanel({
         {items.map((t) => (
           <div
             key={t.id}
-            className="flex items-center justify-between gap-4 rounded-xl border bg-white p-4 dark:bg-[#0a0014]"
+            className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-[#0a0014]"
           >
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">

@@ -11,20 +11,22 @@ import { UISettingsProvider } from "@/context/UISettingsProvider";
 import { AuthContext } from "@/context/auth-context";
 
 import LayoutShell from "./components/LayoutShell";
+import { useAuth } from "@/hooks/useAuth";
+import AppLoader from "@/components/ui/AppLoader";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const auth = useContext(AuthContext);
+  const auth = useAuth();
 
   const router = useRouter();
 
   useEffect(() => {
     if (!auth?.loading && !auth?.user) {
-      router.push("/login");
+      router.replace("/login");
     }
   }, [auth, router]);
 
   if (auth?.loading) {
-    return <div>Loading...</div>;
+    return <AppLoader />;
   }
 
   if (!auth?.user) {

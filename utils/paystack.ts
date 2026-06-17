@@ -9,7 +9,7 @@ export const payWithPaystack = ({
 }: {
   email: string;
   amount: number;
-  onSuccess: () => void;
+  onSuccess: (response: any) => void;
   onClose?: () => void;
 }) => {
   const handler = (window as any).PaystackPop.setup({
@@ -18,8 +18,8 @@ export const payWithPaystack = ({
     amount, // in kobo
     currency: "NGN",
 
-    callback: function () {
-      onSuccess();
+    callback: function (response: any) {
+      onSuccess(response);
     },
 
     onClose: function () {

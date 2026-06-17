@@ -41,8 +41,8 @@ export function RecentMeetings() {
   };
 
   return (
-    <div className="rounded-xl bg-white dark:bg-black border-gray-200 dark:border-white/10 shadow-sm">
-      <div className="divide-y">
+    <div className="rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-zinc-900 shadow-sm">
+      <div className="divide-y divide-gray-100 dark:divide-white/10">
         {meetings.map((meeting) => (
           <Link
             key={meeting.id}

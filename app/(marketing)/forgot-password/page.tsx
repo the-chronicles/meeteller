@@ -5,6 +5,7 @@ import { forgotPassword } from "@/services/auth.service";
 import { Mail, CheckCircle, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -21,8 +22,13 @@ export default function ForgotPassword() {
       await forgotPassword(email.trim());
       setSuccess(true);
       setEmail("");
+      toast.success("Password reset link sent.");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to send reset link");
+      const message =
+        err.response?.data?.message || "Failed to send reset link";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }

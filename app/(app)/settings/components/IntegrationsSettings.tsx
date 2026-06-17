@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import Image from "next/image";
+import { toast } from "sonner";
 
 const INTEGRATIONS = [
   {
@@ -46,10 +47,18 @@ export default function IntegrationsSettings() {
   const [apps, setApps] = useState(INTEGRATIONS);
 
   const toggleIntegration = (id: string) => {
+    const app = apps.find((item) => item.id === id);
+
+    if (!app) return;
+
     setApps((prev) =>
       prev.map((app) =>
         app.id === id ? { ...app, connected: !app.connected } : app,
       ),
+    );
+
+    toast.success(
+      `${app.name} ${app.connected ? "disconnected" : "connected"}.`,
     );
 
     // 👉 Later:
@@ -61,27 +70,27 @@ export default function IntegrationsSettings() {
     <section className="max-w-2xl space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Connect third-party apps and services to your account.
         </p>
 
-        <button className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white hover:bg-black/90">
+        <button className="rounded-lg bg-black dark:bg-white px-4 py-2 text-sm font-medium text-white dark:text-black hover:bg-black/90 dark:hover:bg-white/90">
           Add app
         </button>
       </div>
 
       {/* Authorized apps */}
-      <div className="rounded-xl border bg-white">
+      <div className="rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-zinc-900">
         {apps.map((app, index) => (
           <div
             key={app.id}
             className={`flex items-center justify-between gap-4 px-5 py-4 ${
-              index !== apps.length - 1 ? "border-b" : ""
+              index !== apps.length - 1 ? "border-b border-gray-100 dark:border-white/10" : ""
             }`}
           >
             {/* Left */}
             <div className="flex items-center gap-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-100 dark:bg-white/10">
                 <Image
                   src={app.icon}
                   alt={app.name}
@@ -92,15 +101,15 @@ export default function IntegrationsSettings() {
               </div>
 
               <div className="space-y-0.5">
-                <p className="text-sm font-medium">{app.name}</p>
-                <p className="text-sm text-gray-500">{app.description}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{app.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{app.description}</p>
               </div>
             </div>
 
             {/* Right */}
             <div className="flex items-center gap-3">
               {app.connected && (
-                <span className="rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+                <span className="rounded-full bg-green-50 dark:bg-green-950/20 px-2.5 py-1 text-xs font-medium text-green-700 dark:text-green-400">
                   Connected
                 </span>
               )}
@@ -109,8 +118,8 @@ export default function IntegrationsSettings() {
                 onClick={() => toggleIntegration(app.id)}
                 className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                   app.connected
-                    ? "border bg-white text-gray-700 hover:bg-gray-50"
-                    : "bg-black text-white hover:bg-black/90"
+                    ? "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:bg-zinc-800 dark:border-white/10 dark:text-gray-300 dark:hover:bg-zinc-700"
+                    : "bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90"
                 }`}
               >
                 {app.connected ? "Disconnect" : "Connect"}

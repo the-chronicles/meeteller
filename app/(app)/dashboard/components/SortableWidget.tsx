@@ -7,8 +7,8 @@ import type { HTMLAttributes, ReactNode } from "react";
 type SortableWidgetProps = {
   id: string;
   children: (args: {
-    attributes: HTMLAttributes<HTMLElement>;
-    listeners: HTMLAttributes<HTMLElement>;
+    attributes: any;
+    listeners: any;
   }) => ReactNode;
 };
 

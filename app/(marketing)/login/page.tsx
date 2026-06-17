@@ -8,6 +8,7 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -48,7 +49,7 @@ export default function Login() {
   // };
 
   const signInWithMicrosoft = async () => {
-    alert("Microsoft auth coming soon");
+    toast.info("Microsoft sign in is coming soon.");
   };
 
   // const loginWithEmail = async (email: string, password: string) => {
@@ -86,7 +87,10 @@ export default function Login() {
 
       window.location.href = "/dashboard";
     } catch (err: any) {
-      setError(err.response?.data?.message || "Login failed");
+      const message = err.response?.data?.message || "Login failed";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -106,7 +110,7 @@ export default function Login() {
         </div> */}
 
         <h1 className="font-helvetica text-center text-3xl font-semibold text-white">
-          Welcome Back!
+          Welcome Back
         </h1>
 
         {error && (
@@ -176,7 +180,7 @@ export default function Login() {
           disabled={loading}
           className="mt-6 h-12 w-full rounded-xl bg-white/20 py-3 font-semibold text-white shadow-lg transition hover:bg-white/30 disabled:opacity-60"
         >
-          {loading ? "Signing in..." : "Sign In"}
+          {loading ? "Logging in..." : "Login"}
         </button>
 
         <div className="my-6 flex items-center gap-4">
@@ -206,7 +210,7 @@ export default function Login() {
           </button>
         </div>
 
-        <p className="mt-6 text-center text-sm text-[#8c8b8b]">
+        {/* <p className="mt-6 text-center text-sm text-[#8c8b8b]">
           Don’t have an account?{" "}
           <Link
             href="/signup"
@@ -214,7 +218,7 @@ export default function Login() {
           >
             Sign Up
           </Link>
-        </p>
+        </p> */}
       </div>
     </div>
   );

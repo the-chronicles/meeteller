@@ -7,7 +7,7 @@ function Card({ name, role, delay, className, avatar }: any) {
   return (
     <div
       style={{ animationDelay: delay }}
-      className={`absolute animate-float rounded-xl bg-white px-4 py-3 shadow-lg ${className}`}
+      className={`hidden sm:block absolute animate-float rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-lg dark:border-white/10 dark:bg-zinc-900 ${className}`}
     >
       {/* Avatar */}
       <div className="relative mb-2 h-10 w-10">

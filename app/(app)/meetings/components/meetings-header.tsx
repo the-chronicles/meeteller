@@ -30,7 +30,7 @@ export function MeetingsHeader({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search meetings..."
-            className="w-full rounded-lg border bg-white py-2 pr-3 pl-9 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:bg-[#0a0014]"
+            className="w-full rounded-lg border border-gray-200 bg-white py-2 pr-3 pl-9 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:bg-[#0a0014] dark:border-white/10 dark:text-white dark:focus:ring-white/10"
           />
         </div>
 

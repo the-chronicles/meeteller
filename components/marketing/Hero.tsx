@@ -5,6 +5,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShaderGradientCanvas, ShaderGradient } from "@shadergradient/react";
 
+const ShaderGradientComponent = ShaderGradient as any;
+
 export default function Home() {
   return (
     <section className="relative min-h-175 w-full overflow-hidden bg-black px-4 pt-32 pb-40 text-center md:min-h-180 md:pt-40 md:pb-52">
@@ -63,7 +65,7 @@ export default function Home() {
             zoomOut={false}
           /> */}
 
-          <ShaderGradient
+          <ShaderGradientComponent
             animate="on"
             axesHelper="off"
             brightness={0.3}

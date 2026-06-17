@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { TaskCard } from "./task-card";
 import type { Priority, Task, TaskStatus } from "./types";
 import type { RangeKey } from "./tasks-filters";
@@ -162,7 +163,8 @@ export function TasksTable({
       if (!withinRange(t.dueISO, range)) return false;
       if (assigneeFilter === "me" && t.assignee !== myName) return false;
       if (statusFilter !== "all" && t.status !== statusFilter) return false;
-      if (priorityFilter !== "all" && t.priority !== priorityFilter) return false;
+      if (priorityFilter !== "all" && t.priority !== priorityFilter)
+        return false;
 
       if (!q) return true;
 
@@ -252,13 +254,17 @@ export function TasksTable({
     if (!selected) return;
     setTasks((prev) => prev.filter((t) => t.id !== selected.id));
     setSelected(null);
+    toast.success("Task deleted.");
   };
 
   // ---------------------------
   // Create task
   // ---------------------------
   const createTask = () => {
-    if (!newTask.title.trim()) return;
+    if (!newTask.title.trim()) {
+      toast.error("Enter a task title.");
+      return;
+    }
 
     const dueISO = new Date(newTask.due).toISOString();
 
@@ -284,6 +290,7 @@ export function TasksTable({
       status: "Todo",
       priority: "Medium",
     }));
+    toast.success("Task created.");
   };
 
   return (
@@ -291,7 +298,8 @@ export function TasksTable({
       {/* Top actions */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          Drag tasks between columns • Drop into <span className="font-medium">Completed</span> to mark done
+          Drag tasks between columns • Drop into{" "}
+          <span className="font-medium">Completed</span> to mark done
         </div>
 
         <button
@@ -312,13 +320,15 @@ export function TasksTable({
             className={`rounded-2xl border ${col.border} overflow-hidden bg-white dark:bg-[#0a0014]`}
           >
             {/* Sticky colored header */}
-            <div className={`sticky top-0 z-10 ${col.headerBg} px-4 py-4 text-white`}>
+            <div
+              className={`sticky top-0 z-10 ${col.headerBg} px-4 py-4 text-white`}
+            >
               <div className="flex items-start justify-between">
                 <div>
                   <p className="text-sm font-medium">{col.title}</p>
                   <p className="text-xs opacity-90">{col.subtitle}</p>
                 </div>
-                <div className="text-3xl font-semibold leading-none">
+                <div className="text-3xl leading-none font-semibold">
                   {counts[col.key]}
                 </div>
               </div>
@@ -326,7 +336,7 @@ export function TasksTable({
 
             {/* Column body (scroll) */}
             <div className={`p-4 ${col.tint} dark:bg-transparent`}>
-              <div className="h-[calc(100vh-360px)] overflow-y-auto pr-1 space-y-3">
+              <div className="h-[calc(100vh-360px)] space-y-3 overflow-y-auto pr-1">
                 {grouped[col.key].length === 0 ? (
                   <div className="rounded-xl border border-dashed bg-white/70 p-4 text-sm text-gray-500 dark:bg-white/5 dark:text-gray-300">
                     Drop tasks here.
@@ -378,17 +388,23 @@ export function TasksTable({
                 <label className="text-xs text-gray-500">Title</label>
                 <input
                   value={newTask.title}
-                  onChange={(e) => setNewTask((v) => ({ ...v, title: e.target.value }))}
+                  onChange={(e) =>
+                    setNewTask((v) => ({ ...v, title: e.target.value }))
+                  }
                   className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   placeholder="e.g. Follow up with client"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-gray-500">Description (optional)</label>
+                <label className="text-xs text-gray-500">
+                  Description (optional)
+                </label>
                 <textarea
                   value={newTask.description}
-                  onChange={(e) => setNewTask((v) => ({ ...v, description: e.target.value }))}
+                  onChange={(e) =>
+                    setNewTask((v) => ({ ...v, description: e.target.value }))
+                  }
                   className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   rows={3}
                   placeholder="Add context..."
@@ -400,7 +416,9 @@ export function TasksTable({
                   <label className="text-xs text-gray-500">Assignee</label>
                   <input
                     value={newTask.assignee}
-                    onChange={(e) => setNewTask((v) => ({ ...v, assignee: e.target.value }))}
+                    onChange={(e) =>
+                      setNewTask((v) => ({ ...v, assignee: e.target.value }))
+                    }
                     className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                     placeholder="e.g. CFO"
                   />
@@ -411,7 +429,9 @@ export function TasksTable({
                   <input
                     type="date"
                     value={newTask.due}
-                    onChange={(e) => setNewTask((v) => ({ ...v, due: e.target.value }))}
+                    onChange={(e) =>
+                      setNewTask((v) => ({ ...v, due: e.target.value }))
+                    }
                     className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   />
                 </div>
@@ -420,7 +440,12 @@ export function TasksTable({
                   <label className="text-xs text-gray-500">Priority</label>
                   <select
                     value={newTask.priority}
-                    onChange={(e) => setNewTask((v) => ({ ...v, priority: e.target.value as Priority }))}
+                    onChange={(e) =>
+                      setNewTask((v) => ({
+                        ...v,
+                        priority: e.target.value as Priority,
+                      }))
+                    }
                     className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   >
                     <option>High</option>
@@ -433,7 +458,12 @@ export function TasksTable({
                   <label className="text-xs text-gray-500">Status</label>
                   <select
                     value={newTask.status}
-                    onChange={(e) => setNewTask((v) => ({ ...v, status: e.target.value as TaskStatus }))}
+                    onChange={(e) =>
+                      setNewTask((v) => ({
+                        ...v,
+                        status: e.target.value as TaskStatus,
+                      }))
+                    }
                     className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   >
                     <option>Todo</option>
@@ -465,15 +495,19 @@ export function TasksTable({
       {/* Drawer (task details) */}
       {selected && (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/25" onClick={() => setSelected(null)} />
-          <div className="absolute right-0 top-0 h-full shadow-2xl w-full max-w-md bg-white dark:bg-[#0a0014]">
+          <div
+            className="absolute inset-0 bg-black/25"
+            onClick={() => setSelected(null)}
+          />
+          <div className="absolute top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl dark:bg-[#0a0014]">
             <div className="flex items-start justify-between border-b p-5">
               <div>
                 <h3 className="text-lg font-semibold">{selected.title}</h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   {selected.meeting ? (
                     <>
-                      From <span className="font-medium">{selected.meeting}</span>
+                      From{" "}
+                      <span className="font-medium">{selected.meeting}</span>
                     </>
                   ) : (
                     <span className="font-medium">Manual task</span>
@@ -499,7 +533,9 @@ export function TasksTable({
                   <p className="mb-1 text-xs text-gray-500">Priority</p>
                   <select
                     value={selected.priority}
-                    onChange={(e) => updateSelected({ priority: e.target.value as Priority })}
+                    onChange={(e) =>
+                      updateSelected({ priority: e.target.value as Priority })
+                    }
                     className="w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   >
                     <option>High</option>
@@ -512,7 +548,9 @@ export function TasksTable({
                   <p className="mb-1 text-xs text-gray-500">Status</p>
                   <select
                     value={selected.status}
-                    onChange={(e) => updateSelected({ status: e.target.value as TaskStatus })}
+                    onChange={(e) =>
+                      updateSelected({ status: e.target.value as TaskStatus })
+                    }
                     className="w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   >
                     <option>Todo</option>
@@ -525,7 +563,9 @@ export function TasksTable({
                   <p className="mb-1 text-xs text-gray-500">Assignee</p>
                   <input
                     value={selected.assignee}
-                    onChange={(e) => updateSelected({ assignee: e.target.value })}
+                    onChange={(e) =>
+                      updateSelected({ assignee: e.target.value })
+                    }
                     className="w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   />
                 </div>
@@ -536,7 +576,9 @@ export function TasksTable({
                     type="date"
                     value={selected.dueISO.slice(0, 10)}
                     onChange={(e) =>
-                      updateSelected({ dueISO: new Date(e.target.value).toISOString() })
+                      updateSelected({
+                        dueISO: new Date(e.target.value).toISOString(),
+                      })
                     }
                     className="w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   />
@@ -552,7 +594,7 @@ export function TasksTable({
                 </button>
                 <button
                   onClick={deleteSelected}
-                  className="rounded-lg bg-red-500 text-white px-3 py-2 text-sm"
+                  className="rounded-lg bg-red-500 px-3 py-2 text-sm text-white"
                 >
                   Delete
                 </button>

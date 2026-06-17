@@ -9,6 +9,7 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
+import { toast } from "sonner";
 
 import { DashboardGreeting } from "./components/DashboardGreeting";
 import { RecentMeetings } from "./components/recent-meetings";
@@ -57,20 +58,19 @@ export default function DashboardPage() {
   function resetDashboard() {
     setWidgets(DEFAULT_WIDGETS);
     localStorage.removeItem("dashboard-layout");
+    toast.success("Dashboard layout reset.");
   }
 
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen space-y-6 bg-gray-50 p-6 dark:bg-black">
+    <div className="space-y-6 bg-transparent p-4 md:p-6">
       <DashboardGreeting />
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        {/* LEFT: STATS */}
+      {/* <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex-1">
           <StatsCards />
         </div>
 
-        {/* RIGHT: RESET */}
         <div className="flex justify-end">
           <button
             onClick={resetDashboard}
@@ -79,7 +79,7 @@ export default function DashboardPage() {
             Reset Dashboard
           </button>
         </div>
-      </div>
+      </div> */}
 
       <DndContext
         collisionDetection={closestCenter}
@@ -97,7 +97,7 @@ export default function DashboardPage() {
           items={widgets.map((w) => w.id)}
           strategy={verticalListSortingStrategy}
         >
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="mt-20 grid grid-cols-1 gap-6 lg:grid-cols-2">
             {widgets.map((widget) => (
               <SortableWidget key={widget.id} id={widget.id}>
                 {({
@@ -176,6 +176,14 @@ export default function DashboardPage() {
           </div>
         </SortableContext>
       </DndContext>
+      <div className="mt-20 flex justify-center">
+        <button
+          onClick={resetDashboard}
+          className="rounded-lg border border-red-200 bg-black px-4 py-2 text-sm font-medium text-white hover:cursor-pointer dark:border-white/10 dark:bg-black dark:hover:bg-white/10"
+        >
+          Reset Dashboard
+        </button>
+      </div>
     </div>
   );
 }

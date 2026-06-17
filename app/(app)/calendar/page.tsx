@@ -90,19 +90,20 @@ function monthGrid(year: number, month: number) {
 function appleEventColor(c?: CalEvent["color"]) {
   switch (c) {
     case "blue":
-      return "bg-blue-500/15 text-blue-900 border-blue-500/20";
+      return "bg-blue-500/15 text-blue-900 border-blue-500/20 dark:text-blue-200 dark:border-blue-500/30";
     case "green":
-      return "bg-emerald-500/15 text-emerald-900 border-emerald-500/20";
+      return "bg-emerald-500/15 text-emerald-900 border-emerald-500/20 dark:text-emerald-200 dark:border-emerald-500/30";
     case "yellow":
-      return "bg-amber-500/15 text-amber-900 border-amber-500/20";
+      return "bg-amber-500/15 text-amber-900 border-amber-500/20 dark:text-amber-200 dark:border-amber-500/30";
     case "pink":
-      return "bg-pink-500/15 text-pink-900 border-pink-500/20";
+      return "bg-pink-500/15 text-pink-900 border-pink-500/20 dark:text-pink-200 dark:border-pink-500/30";
     case "purple":
-      return "bg-purple-500/15 text-purple-900 border-purple-500/20";
+      return "bg-purple-500/15 text-purple-900 border-purple-500/20 dark:text-purple-200 dark:border-purple-500/30";
     default:
-      return "bg-gray-900/5 text-gray-900 border-gray-900/10";
+      return "bg-gray-900/5 text-gray-900 border-gray-900/10 dark:bg-white/5 dark:text-zinc-200 dark:border-white/10";
   }
 }
+
 
 export default function CalendarPage() {
   const { events: storeEvents } = useEvents();
@@ -213,43 +214,43 @@ export default function CalendarPage() {
 
   return (
     <div className="h-full">
-      <div className="mx-auto h-full w-full overflow-hidden rounded-3xl bg-white shadow-sm">
+      <div className="mx-auto h-full w-full overflow-hidden rounded-3xl bg-white dark:bg-zinc-900/50 dark:border dark:border-white/10 shadow-sm">
         {/* Toolbar */}
-        <div className="border-b">
+        <div className="border-b dark:border-white/10">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-2">
               <button
                 onClick={goToday}
-                className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
+                className="rounded-lg border dark:border-white/10 px-3 py-1.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
               >
                 Today
               </button>
               <div className="flex items-center gap-1">
                 <button
                   onClick={goPrev}
-                  className="rounded-lg border px-2 py-1.5 text-sm hover:bg-gray-50"
+                  className="rounded-lg border dark:border-white/10 px-2 py-1.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
                 >
                   ‹
                 </button>
                 <button
                   onClick={goNext}
-                  className="rounded-lg border px-2 py-1.5 text-sm hover:bg-gray-50"
+                  className="rounded-lg border dark:border-white/10 px-2 py-1.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-800"
                 >
                   ›
                 </button>
               </div>
 
-              <h1 className="ml-2 text-base font-semibold text-gray-900">{headerTitle}</h1>
+              <h1 className="ml-2 text-base font-semibold text-gray-900 dark:text-white">{headerTitle}</h1>
             </div>
 
             <div className="flex items-center gap-2">
-              <div className="rounded-xl border bg-gray-50 p-1">
+              <div className="rounded-xl border dark:border-white/10 bg-gray-50 dark:bg-zinc-800/50 p-1">
                 <button
                   onClick={() => setMode("day")}
                   className={`rounded-lg px-3 py-1 text-sm ${
                     mode === "day"
-                      ? "bg-white shadow-sm"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
                   Day
@@ -258,8 +259,8 @@ export default function CalendarPage() {
                   onClick={() => setMode("week")}
                   className={`rounded-lg px-3 py-1 text-sm ${
                     mode === "week"
-                      ? "bg-white shadow-sm"
-                      : "text-gray-600 hover:text-gray-900"
+                      ? "bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm"
+                      : "text-gray-600 dark:text-zinc-400 hover:text-gray-900 dark:hover:text-white"
                   }`}
                 >
                   Week
@@ -269,23 +270,23 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        <div className="grid h-[calc(100vh-170px)] grid-cols-[280px_1fr]">
+        <div className="grid h-[calc(100vh-170px)] grid-cols-1 md:grid-cols-[280px_1fr]">
           {/* Sidebar */}
-          <aside className="border-r bg-gray-50/60 p-4">
+          <aside className="hidden md:block border-r dark:border-white/10 bg-gray-50/60 dark:bg-zinc-900/30 p-4">
             <div className="mb-3 flex items-center justify-between">
-              <div className="text-sm font-semibold text-gray-900">
+              <div className="text-sm font-semibold text-gray-900 dark:text-white">
                 {anchor.toLocaleDateString(undefined, { month: "long", year: "numeric" })}
               </div>
               <div className="flex gap-1">
                 <button
                   onClick={() => setAnchor((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1))}
-                  className="rounded-md border bg-white px-2 py-1 text-sm hover:bg-gray-50"
+                  className="rounded-md border dark:border-white/10 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 px-2 py-1 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700"
                 >
                   ‹
                 </button>
                 <button
                   onClick={() => setAnchor((d) => new Date(d.getFullYear(), d.getMonth() + 1, 1))}
-                  className="rounded-md border bg-white px-2 py-1 text-sm hover:bg-gray-50"
+                  className="rounded-md border dark:border-white/10 bg-white dark:bg-zinc-800 text-gray-700 dark:text-zinc-300 px-2 py-1 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700"
                 >
                   ›
                 </button>
@@ -293,8 +294,8 @@ export default function CalendarPage() {
             </div>
 
             {/* Mini month with week numbers */}
-            <div className="rounded-2xl border bg-white p-3">
-              <div className="grid grid-cols-8 gap-1 text-[11px] text-gray-500">
+            <div className="rounded-2xl border dark:border-white/10 bg-white dark:bg-zinc-900/50 p-3">
+              <div className="grid grid-cols-8 gap-1 text-[11px] text-gray-500 dark:text-zinc-400">
                 <div className="text-center">Week</div>
                 {["M", "T", "W", "T", "F", "S", "S"].map((x) => (
                   <div key={x} className="text-center">
@@ -306,7 +307,7 @@ export default function CalendarPage() {
               <div className="mt-2 space-y-1">
                 {miniMonth.map((week, wi) => (
                   <div key={wi} className="grid grid-cols-8 gap-1">
-                    <div className="flex h-7 items-center justify-center text-[11px] text-gray-400">
+                    <div className="flex h-7 items-center justify-center text-[11px] text-gray-400 dark:text-zinc-500">
                       {getWeekNumber(week[0])}
                     </div>
 
@@ -320,8 +321,8 @@ export default function CalendarPage() {
                           onClick={() => setAnchor(d)}
                           className={[
                             "h-7 rounded-lg text-xs transition",
-                            inMonth ? "text-gray-900" : "text-gray-400",
-                            active ? "bg-[#5b09c4] text-white" : "hover:bg-gray-100",
+                            inMonth ? "text-gray-900 dark:text-zinc-100" : "text-gray-400 dark:text-zinc-600",
+                            active ? "bg-[#5b09c4] text-white" : "hover:bg-gray-100 dark:hover:bg-zinc-800",
                             today && !active ? "ring-1 ring-[#5b09c4]" : "",
                           ].join(" ")}
                         >
@@ -335,10 +336,10 @@ export default function CalendarPage() {
             </div>
 
             {/* Calendar toggles */}
-            <div className="mt-4 rounded-2xl border bg-white p-3">
-              <div className="text-xs font-semibold text-gray-800">Calendars</div>
+            <div className="mt-4 rounded-2xl border dark:border-white/10 bg-white dark:bg-zinc-900/50 p-3">
+              <div className="text-xs font-semibold text-gray-800 dark:text-zinc-300">Calendars</div>
 
-              <div className="mt-3 space-y-2 text-sm text-gray-700">
+              <div className="mt-3 space-y-2 text-sm text-gray-700 dark:text-zinc-300">
                 <label className="flex items-center justify-between gap-3">
                   <span className="flex items-center gap-2">
                     <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
@@ -390,24 +391,24 @@ export default function CalendarPage() {
           {/* Main calendar */}
           <section className="relative">
             {/* Day headers */}
-            <div className="sticky top-0 z-10 border-b bg-white">
+            <div className="sticky top-0 z-10 border-b dark:border-white/10 bg-white dark:bg-zinc-900">
               <div className={`grid ${gridColsHeader}`}>
-                <div className="px-3 py-2 text-xs text-gray-400" />
-                {mode === "week" && <div className="px-2 py-2 text-[11px] text-gray-400">Week</div>}
+                <div className="px-3 py-2 text-xs text-gray-400 dark:text-zinc-500" />
+                {mode === "week" && <div className="px-2 py-2 text-[11px] text-gray-400 dark:text-zinc-500">Week</div>}
 
                 {days.map((d) => {
                   const isToday = isSameDay(d, new Date());
                   return (
                     <div key={d.toISOString()} className="px-3 py-2">
                       <div className="flex items-baseline justify-between">
-                        <div className="text-xs text-gray-500">{dayLabel(d)}</div>
+                        <div className="text-xs text-gray-500 dark:text-zinc-400">{dayLabel(d)}</div>
 
                         {isToday ? (
                           <div className="flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-sm font-semibold text-white">
                             {d.getDate()}
                           </div>
                         ) : (
-                          <div className="text-sm font-semibold text-gray-900">{d.getDate()}</div>
+                          <div className="text-sm font-semibold text-gray-900 dark:text-white">{d.getDate()}</div>
                         )}
                       </div>
                     </div>
@@ -416,17 +417,17 @@ export default function CalendarPage() {
               </div>
 
               {/* All-day row */}
-              <div className={`grid border-t ${gridColsHeader}`}>
-                <div className="px-3 py-2 text-[11px] text-gray-400">all-day</div>
+              <div className={`grid border-t dark:border-white/10 ${gridColsHeader}`}>
+                <div className="px-3 py-2 text-[11px] text-gray-400 dark:text-zinc-500">all-day</div>
                 {mode === "week" && (
-                  <div className="px-2 py-2 text-[11px] text-gray-400">
+                  <div className="px-2 py-2 text-[11px] text-gray-400 dark:text-zinc-500">
                     {getWeekNumber(days[0])}
                   </div>
                 )}
                 {days.map((d) => (
                   <div
                     key={d.toISOString()}
-                    className="min-h-8.5 border-l px-2 py-1 first:border-l-0"
+                    className="min-h-8.5 border-l dark:border-white/10 px-2 py-1 first:border-l-0"
                   />
                 ))}
               </div>
@@ -435,7 +436,7 @@ export default function CalendarPage() {
             {/* Scroll grid */}
             <div
               ref={scrollerRef}
-              className="relative h-[calc(100vh-250px)] overflow-auto bg-white"
+              className="relative h-[calc(100vh-250px)] overflow-auto bg-white dark:bg-zinc-900"
             >
               {/* Current time line */}
               {showNowLine && (
@@ -444,7 +445,7 @@ export default function CalendarPage() {
                   style={{ top: nowTop }}
                 >
                   <div className="flex items-center">
-                    <div className="w-16 px-2 text-[10px] text-gray-400">
+                    <div className="w-16 px-2 text-[10px] text-gray-400 dark:text-zinc-500">
                       {liveNow.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                     </div>
                     <div className="h-px flex-1 bg-red-500/80" />
@@ -456,17 +457,17 @@ export default function CalendarPage() {
                 {/* time gutter */}
                 <div className="relative">
                   {hours.map((h) => (
-                    <div key={h} className="h-25 border-b px-2 pt-1">
-                      <span className="text-[11px] text-gray-400">{pad2(h)}:00</span>
+                    <div key={h} className="h-25 border-b dark:border-white/10 px-2 pt-1">
+                      <span className="text-[11px] text-gray-400 dark:text-zinc-500">{pad2(h)}:00</span>
                     </div>
                   ))}
                 </div>
 
                 {/* week-number spine */}
                 {mode === "week" && (
-                  <div className="relative border-r bg-white">
+                  <div className="relative border-r dark:border-white/10 bg-white dark:bg-zinc-900">
                     {hours.map((h) => (
-                      <div key={h} className="h-25 border-b" />
+                      <div key={h} className="h-25 border-b dark:border-white/10" />
                     ))}
                   </div>
                 )}
@@ -477,9 +478,9 @@ export default function CalendarPage() {
                   const dayEvents = eventsByDay.get(key) ?? [];
 
                   return (
-                    <div key={key} className="relative border-l first:border-l-0">
+                    <div key={key} className="relative border-l dark:border-white/10 first:border-l-0">
                       {hours.map((h) => (
-                        <div key={h} className="h-25 border-b" />
+                        <div key={h} className="h-25 border-b dark:border-white/10" />
                       ))}
 
                       <div className="absolute inset-0">
@@ -506,7 +507,7 @@ export default function CalendarPage() {
                                 "absolute left-2 right-2 rounded-xl border px-2 py-1.5 text-left shadow-sm backdrop-blur",
                                 "transition hover:shadow-md",
                                 appleEventColor(e.color),
-                                isHighlight ? "ring-2 ring-black animate-pulse" : "",
+                                isHighlight ? "ring-2 ring-black dark:ring-white animate-pulse" : "",
                               ].join(" ")}
                               style={{ top: top + 6, height: height - 10 }}
                             >
@@ -527,22 +528,22 @@ export default function CalendarPage() {
 
             {/* Details popover */}
             {selected && (
-              <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/20 p-4 md:items-center">
-                <div className="w-full max-w-md rounded-2xl bg-white p-4 shadow-xl">
+              <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/20 dark:bg-black/40 p-4 md:items-center">
+                <div className="w-full max-w-md rounded-2xl bg-white dark:bg-zinc-800 border dark:border-white/10 p-4 shadow-xl">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-base font-semibold text-gray-900">{selected.title}</h3>
-                      <p className="mt-1 text-sm text-gray-500">
+                      <h3 className="text-base font-semibold text-gray-900 dark:text-white">{selected.title}</h3>
+                      <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">
                         {new Date(selected.start).toLocaleString()} →{" "}
                         {new Date(selected.end).toLocaleString()}
                       </p>
                       {selected.location && (
-                        <p className="mt-1 text-sm text-gray-500">{selected.location}</p>
+                        <p className="mt-1 text-sm text-gray-500 dark:text-zinc-400">{selected.location}</p>
                       )}
                     </div>
                     <button
                       onClick={() => setSelected(null)}
-                      className="rounded-lg border px-3 py-1.5 text-sm hover:bg-gray-50"
+                      className="rounded-lg border dark:border-white/10 px-3 py-1.5 text-sm text-gray-700 dark:text-zinc-300 hover:bg-gray-50 dark:hover:bg-zinc-700"
                     >
                       Done
                     </button>
@@ -554,16 +555,16 @@ export default function CalendarPage() {
                         href={selected.joinUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="rounded-lg bg-black px-3 py-2 text-sm font-medium text-white"
+                        className="rounded-lg bg-black dark:bg-white dark:text-black px-3 py-2 text-sm font-medium text-white hover:bg-gray-900 dark:hover:bg-zinc-100"
                       >
                         Join
                       </a>
                     ) : null}
 
-                    <button className="rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">
+                    <button className="rounded-lg border dark:border-white/10 text-gray-700 dark:text-zinc-300 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700">
                       Edit
                     </button>
-                    <button className="rounded-lg border px-3 py-2 text-sm hover:bg-gray-50">
+                    <button className="rounded-lg border dark:border-white/10 text-gray-700 dark:text-zinc-300 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-zinc-700">
                       Delete
                     </button>
                   </div>

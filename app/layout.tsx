@@ -2,7 +2,9 @@ import "@/app/globals.css";
 import { AuthProvider } from "@/context/auth-context";
 import { EventsProvider } from "@/context/EventProvider";
 import { ThemeProvider } from "@/context/ThemeProvider";
+import { Toaster } from "@/components/ui/sonner";
 import localFont from "next/font/local";
+import QueryProvider from "./providers/query-provider";
 
 const helvetica = localFont({
   src: [
@@ -69,11 +71,14 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${helvetica.variable} ${sora.variable} font-sans`}
     >
-      <body className="bg-white text-gray-900">
+      <body className="bg-background text-foreground antialiased">
         <ThemeProvider>
-          <AuthProvider>
-            <EventsProvider>{children}</EventsProvider>
-          </AuthProvider>
+          <QueryProvider>
+            <AuthProvider>
+              <EventsProvider>{children}</EventsProvider>
+            </AuthProvider>
+          </QueryProvider>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

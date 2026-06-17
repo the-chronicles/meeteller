@@ -28,7 +28,7 @@ export default function UpcomingMeetings() {
   }, [selectedDate]);
 
   return (
-    <div className="rounded-xl bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-zinc-900">
       <div className="mb-4 flex items-center justify-between">
         <h2 className="font-helvetica text-lg font-semibold">
           Upcoming Meetings
@@ -48,7 +48,7 @@ export default function UpcomingMeetings() {
             <button
               key={day.toISOString()}
               onClick={() => setSelectedDate(day)}
-              className={`flex w-14 flex-col items-center rounded-lg px-3 py-2 text-sm transition ${active ? "bg-black text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
+              className={`flex w-14 flex-col items-center rounded-lg px-3 py-2 text-sm transition ${active ? "bg-black text-white dark:bg-white dark:text-black" : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"}`}
             >
               <span className="text-xs">{format(day, "EEE")}</span>
               <span className="font-semibold">{format(day, "dd")}</span>
@@ -78,10 +78,10 @@ export default function UpcomingMeetings() {
                 <span className="block h-3 w-3 rounded-full bg-emerald-500" />
               </div>
 
-              <div className="flex-1 rounded-lg bg-gray-100 px-4 py-2 text-sm">
+              <div className="flex-1 rounded-lg bg-gray-100 px-4 py-2 text-sm dark:bg-white/5">
                 <p className="font-medium">{m.title}</p>
 
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {format(parseISO(m.start), "HH:mm")} –{" "}
                   {format(parseISO(m.end), "HH:mm")}
                   {m.platform
@@ -95,7 +95,7 @@ export default function UpcomingMeetings() {
                     target="_blank"
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="mt-1 inline-block text-xs text-emerald-600 hover:underline"
+                    className="mt-1 inline-block text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
                   >
                     Join link
                   </a>

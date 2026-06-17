@@ -4,29 +4,33 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ChevronDown, ChevronsLeft, Lock, Menu, X } from "lucide-react";
 
 import { useContext } from "react";
 import { AuthContext } from "@/context/auth-context";
 
 import Image from "next/image";
 import {
-  IconCalendar,
-  IconClipboardCheck,
-  IconGear,
-  IconHouse,
-  IconMsgs,
-  IconVideo,
-  IconUsers,
-} from "nucleo-glass";
-import { IconArrowDoorOut3FillDuo18 } from "nucleo-ui-essential-fill-duo-18";
+  CaretDown,
+  CaretLeft,
+  Lock,
+  List,
+  X,
+  House,
+  Chat,
+  ClipboardText,
+  VideoCamera,
+  Calendar,
+  Users,
+  Gear,
+  SignOut,
+} from "@phosphor-icons/react";
 
 const mainNavItems = [
-  { name: "Home", href: "/dashboard", icon: IconHouse },
-  { name: "Meetings", href: "/meetings", icon: IconMsgs },
-  { name: "Tasks", href: "/tasks", icon: IconClipboardCheck },
-  { name: "Live", href: "/live", icon: IconVideo },
-  { name: "Calendar", href: "/calendar", icon: IconCalendar },
+  { name: "Home", href: "/dashboard", icon: House },
+  { name: "Meetings", href: "/meetings", icon: Chat },
+  { name: "Tasks", href: "/tasks", icon: ClipboardText },
+  { name: "Live", href: "/live", icon: VideoCamera },
+  { name: "Calendar", href: "/calendar", icon: Calendar },
 ];
 
 const teamChildren = [
@@ -76,7 +80,7 @@ export function Sidebar() {
         className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
           active
             ? "bg-[#282828] text-white"
-            : "text-white/80 hover:bg-[#282828]"
+            : "text-black/80 hover:bg-[#282828] dark:text-white/80"
         } ${collapsed ? "justify-center" : ""}`}
       >
         <Icon size={23} />
@@ -87,16 +91,16 @@ export function Sidebar() {
 
   const sidebarInner = (
     <div
-      className={`relative flex h-full flex-col border-r border-white/10 bg-linear-to-b from-black via-[#0a0014] to-[#5b09c4] px-4 py-6 text-white shadow-xl backdrop-blur-2xl transition-all duration-300 ease-in-out ${
+      className={`relative flex h-full flex-col border-r border-black/10 bg-transparent px-4 py-6 text-black shadow-xl transition-all duration-300 ease-in-out dark:border-white/10 dark:text-white ${
         collapsed ? "w-20" : "w-64"
       }`}
     >
       {/* Collapse button - desktop only */}
       <button
         onClick={() => setCollapsed(!collapsed)}
-        className="absolute top-18 -right-3 z-20 hidden rounded-full bg-white p-1 text-black shadow-md lg:block"
+        className="absolute top-16 -right-3 z-50 hidden rounded-full bg-white p-1 text-black shadow-md lg:block dark:bg-white/10 dark:text-white"
       >
-        <ChevronsLeft
+        <CaretLeft
           size={24}
           className={`${collapsed ? "rotate-180" : ""} transition-transform`}
         />
@@ -105,7 +109,7 @@ export function Sidebar() {
       {/* Mobile close button */}
       <button
         onClick={() => setMobileOpen(false)}
-        className="absolute top-4 right-4 rounded-lg p-2 text-white/80 hover:bg-white/10 lg:hidden"
+        className="absolute top-4 right-4 rounded-lg p-2 text-black/80 hover:bg-black/5 lg:hidden dark:text-white/80 dark:hover:bg-white/10"
       >
         <X size={20} />
       </button>
@@ -113,9 +117,30 @@ export function Sidebar() {
       {/* Logo */}
       <div className="mb-10 flex shrink-0 justify-center lg:mb-16">
         {!collapsed ? (
-          <Image src="/logo-white.png" width={140} height={40} alt="logo" />
+          <>
+            <Image
+              src="/logo-black.png"
+              width={140}
+              height={40}
+              alt="logo"
+              className="block dark:hidden"
+            />
+            <Image
+              src="/logo-white.png"
+              width={140}
+              height={40}
+              alt="logo"
+              className="hidden dark:block"
+            />
+          </>
         ) : (
-          <Image src="/icon.png" width={36} height={36} alt="logo" />
+          <Image
+            src="/icon.png"
+            width={36}
+            height={36}
+            alt="logo"
+            className="dark:invert"
+          />
         )}
       </div>
 
@@ -123,7 +148,7 @@ export function Sidebar() {
       <div className="min-h-0 flex-1 overflow-y-auto pr-1">
         <div>
           {!collapsed && (
-            <p className="mb-3 px-3 text-[11px] font-medium tracking-[0.12em] text-white/40 uppercase">
+            <p className="mb-3 px-3 text-[11px] font-medium tracking-[0.12em] text-black/40 uppercase dark:text-white/40">
               Workspace
             </p>
           )}
@@ -133,7 +158,7 @@ export function Sidebar() {
 
         <div className="my-8">
           {!collapsed && (
-            <p className="mb-3 px-3 text-[11px] font-medium tracking-[0.12em] text-white/40 uppercase">
+            <p className="mb-3 px-3 text-[11px] font-medium tracking-[0.12em] text-black/40 uppercase dark:text-white/40">
               Collaboration
             </p>
           )}
@@ -144,11 +169,11 @@ export function Sidebar() {
               className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                 teamsActive
                   ? "bg-[#282828] text-white"
-                  : "text-white/80 hover:bg-[#282828]"
+                  : "text-black/80 hover:bg-[#282828] dark:text-white/80"
               } ${collapsed ? "justify-center" : ""}`}
             >
               <div className="relative flex items-center">
-                <IconUsers size={23} />
+                <Users size={23} />
                 {collapsed && (
                   <span className="absolute -top-1 -right-1 rounded-full bg-white p-0.5 text-black">
                     <Lock size={8} />
@@ -159,7 +184,7 @@ export function Sidebar() {
               {!collapsed && (
                 <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
                   <span className="whitespace-nowrap">Teams</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-white/90">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-0.5 text-[10px] text-black/90 dark:text-white/90">
                     <Lock size={10} />
                     Locked
                   </span>
@@ -173,17 +198,17 @@ export function Sidebar() {
                 className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                   teamsActive
                     ? "bg-[#282828] text-white"
-                    : "text-white/80 hover:bg-[#282828]"
+                    : "text-black/80 hover:bg-[#282828] dark:text-white/80"
                 } ${collapsed ? "justify-center" : ""}`}
               >
-                <IconUsers size={23} />
+                <Users size={23} />
 
                 {!collapsed && (
                   <>
                     <span className="flex-1 text-left whitespace-nowrap">
                       Teams
                     </span>
-                    <ChevronDown
+                    <CaretDown
                       size={16}
                       className={`transition-transform ${
                         teamsOpen ? "rotate-180" : ""
@@ -204,7 +229,7 @@ export function Sidebar() {
                         className={`block rounded-md px-3 py-2 text-sm transition ${
                           active
                             ? "bg-white/10 text-white"
-                            : "text-white/70 hover:bg-white/5 hover:text-white"
+                            : "text-black/70 hover:bg-white/5 hover:text-white dark:text-white/70"
                         }`}
                       >
                         {item.name}
@@ -219,24 +244,24 @@ export function Sidebar() {
       </div>
 
       {/* Bottom actions */}
-      <div className="mt-4 mb-3 shrink-0 space-y-4 border-t border-white/10 pt-4 pb-2">
+      <div className="mt-4 mb-3 shrink-0 space-y-4 border-t border-black/10 pt-4 pb-2 dark:border-white/10">
         <Link
           href="/settings"
-          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10 ${
+          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-black/90 hover:bg-black/5 dark:text-white/90 dark:hover:bg-white/10 ${
             collapsed ? "justify-center" : ""
           }`}
         >
-          <IconGear size={23} />
+          <Gear size={23} />
           {!collapsed && "Settings"}
         </Link>
 
         <button
           onClick={auth?.logout}
-          className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10 ${
+          className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-black/90 hover:bg-black/5 dark:text-white/90 dark:hover:bg-white/10 ${
             collapsed ? "justify-center" : ""
           }`}
         >
-          <IconArrowDoorOut3FillDuo18 size={23} />
+          <SignOut size={23} />
           {!collapsed && "Logout"}
         </button>
       </div>
@@ -248,9 +273,9 @@ export function Sidebar() {
       {/* Mobile trigger */}
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-4 left-4 z-50 rounded-lg bg-[#0a0014] p-2 text-white shadow-lg lg:hidden"
+        className="fixed top-4 left-4 z-50 rounded-lg bg-white p-2 text-black shadow-lg lg:hidden dark:bg-[#0a0014] dark:text-white"
       >
-        <Menu size={20} />
+        <List size={20} />
       </button>
 
       {/* Desktop sidebar */}

@@ -21,15 +21,15 @@ export default function NotificationsSettings() {
 
   return (
     <section className="max-w-2xl space-y-8">
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-gray-500 dark:text-gray-400">
         Control how and when you get notifications.
       </p>
 
       {/* Email Notifications */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium">Email notifications</h3>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white">Email notifications</h3>
 
-        <div className="rounded-xl border bg-white">
+        <div className="rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-zinc-900">
           <ToggleRow
             label="Product updates"
             description="New features, improvements, and updates."
@@ -54,9 +54,9 @@ export default function NotificationsSettings() {
 
       {/* In-App Notifications */}
       <div className="space-y-4">
-        <h3 className="text-sm font-medium">In-app notifications</h3>
+        <h3 className="text-sm font-medium text-gray-900 dark:text-white">In-app notifications</h3>
 
-        <div className="rounded-xl border bg-white">
+        <div className="rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-zinc-900">
           {/* <ToggleRow
             label="Mentions & replies"
             description="When someone mentions or replies to you."
@@ -102,12 +102,12 @@ function ToggleRow({
   return (
     <div
       className={`flex items-center justify-between gap-4 px-5 py-4 ${
-        border ? "border-b" : ""
+        border ? "border-b border-gray-100 dark:border-white/10" : ""
       }`}
     >
       <div className="space-y-1">
-        <p className="text-sm font-medium">{label}</p>
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-sm font-medium text-gray-900 dark:text-white">{label}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
       </div>
 
       {/* Toggle */}
@@ -116,7 +116,7 @@ function ToggleRow({
         role="switch"
         aria-checked={enabled}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-          enabled ? "bg-black" : "bg-gray-200"
+          enabled ? "bg-[#5b09c4]" : "bg-gray-200 dark:bg-zinc-700"
         }`}
       >
         <span

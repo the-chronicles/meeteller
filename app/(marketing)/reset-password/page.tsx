@@ -5,9 +5,10 @@ import { resetPassword } from "@/services/auth.service";
 import { Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { toast } from "sonner";
 
-export default function ResetPassword() {
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
@@ -34,16 +35,19 @@ export default function ResetPassword() {
 
     if (!token) {
       setError("Invalid reset link");
+      toast.error("Invalid reset link");
       return;
     }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
     if (getPasswordStrength(password) < 2) {
       setError("Password is too weak");
+      toast.error("Password is too weak");
       return;
     }
 
@@ -52,11 +56,15 @@ export default function ResetPassword() {
     try {
       await resetPassword(token, password);
       setSuccess(true);
+      toast.success("Password updated successfully.");
       setTimeout(() => {
         window.location.href = "/login";
       }, 3000);
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to reset password");
+      const message = err.response?.data?.message || "Failed to reset password";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -213,5 +221,17 @@ export default function ResetPassword() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-linear-to-b from-black via-[#0a0014] to-[#5b09c4] px-4">
+        <div className="text-white text-sm">Loading...</div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
