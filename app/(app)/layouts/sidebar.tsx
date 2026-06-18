@@ -139,7 +139,7 @@ export function Sidebar() {
             width={36}
             height={36}
             alt="logo"
-            className="dark:invert"
+            // className="dark:invert"
           />
         )}
       </div>

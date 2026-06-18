@@ -4,7 +4,7 @@ export type TaskStatus = "Todo" | "In Progress" | "Done";
 export type TaskOrigin = "meeting" | "manual";
 
 export type Task = {
-  id: number;
+  id: string;
   title: string;
   meeting?: string; // optional now
   assignee: string;

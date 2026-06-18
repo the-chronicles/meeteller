@@ -27,7 +27,7 @@ export default function LiveMeetingPage() {
               Weekly Product Sync
               <span className="relative ml-2 inline-block">
                 Meeting
-                <span className="absolute -bottom-2 left-0 h-1 w-full rounded bg-[#5b09c4]" />
+                {/* <span className="absolute -bottom-2 left-0 h-1 w-full rounded bg-[#5b09c4]" /> */}
               </span>
             </h1>
           </div>
@@ -42,7 +42,7 @@ export default function LiveMeetingPage() {
           <div className="pb-10 text-center">
             <button
               onClick={() => setShowTranscript((v) => !v)}
-              className="group inline-flex items-center gap-1 text-sm font-medium text-gray-800 dark:text-gray-200 hover:text-black dark:hover:text-white"
+              className="group inline-flex items-center gap-1 text-sm font-medium text-gray-800 hover:text-black dark:text-gray-200 dark:hover:text-white"
             >
               View live transcript
               <span className="transition group-hover:translate-x-0.5">↗</span>
@@ -51,7 +51,7 @@ export default function LiveMeetingPage() {
         </div>
         {/* ================= TRANSCRIPT SIDE ================= */}
         {showTranscript && (
-          <div className="absolute top-0 right-0 h-full w-full sm:w-1/3 md:w-1/4 border-l border-gray-200 bg-white dark:border-white/10 dark:bg-zinc-950">
+          <div className="absolute top-0 right-0 h-full w-full border-l border-gray-200 bg-white sm:w-1/3 md:w-1/4 dark:border-white/10 dark:bg-zinc-950">
             <LiveTranscript />
           </div>
         )}

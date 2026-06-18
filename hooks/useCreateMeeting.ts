@@ -20,8 +20,9 @@ export function useCreateMeeting() {
       toast.success("Meeting created successfully.");
     },
 
-    onError: () => {
-      toast.error("Unable to create meeting.");
+    onError: (err: any) => {
+      const msg = err?.response?.data?.message || "Unable to create meeting.";
+      toast.error(msg);
     },
   });
 }

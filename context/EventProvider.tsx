@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useMeetings } from "@/hooks/useMeetings";
 
 export type MeetingPlatform = "google_meet" | "zoom";
 export type CalendarSource = "all" | "google" | "microsoft" | "internal";
@@ -32,43 +33,79 @@ type EventsCtx = {
 
 const EventsContext = createContext<EventsCtx | null>(null);
 
-const seedEvents: CalEvent[] = [
-  {
-    id: "m1",
-    title: "Discovery Call",
-    start: "2026-01-22T10:00:00",
-    end: "2026-01-22T10:30:00",
-    source: "internal",
-    status: "confirmed",
-    color: "green",
-    isMeeting: true,
-    platform: "google_meet",
-    joinUrl: "https://meet.google.com/abc-defg-hij",
-  },
-  {
-    id: "m2",
-    title: "Company Onboarding",
-    start: "2026-01-22T12:00:00",
-    end: "2026-01-22T13:00:00",
-    source: "internal",
-    status: "confirmed",
-    color: "yellow",
-    isMeeting: true,
-    platform: "zoom",
-    joinUrl: "https://zoom.us/j/12345678901?pwd=abcd1234",
-  },
-];
-
 export function EventsProvider({ children }: { children: React.ReactNode }) {
-  const [events, setEvents] = useState<CalEvent[]>(seedEvents);
+  const { data: meetings = [] } = useMeetings();
+  const [localEvents, setLocalEvents] = useState<CalEvent[]>([]);
 
-  const addEvent = (e: CalEvent) => setEvents((prev) => [e, ...prev]);
+  // Load local calendar events on mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("meeteller-calendar-events");
+    if (saved) {
+      try {
+        setLocalEvents(JSON.parse(saved));
+      } catch {
+        setLocalEvents([]);
+      }
+    }
+  }, []);
 
-  const updateEvent = (id: string, patch: Partial<CalEvent>) =>
-    setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+  // Map backend meetings with status = scheduled
+  const dbEvents = useMemo(() => {
+    return meetings
+      .filter((m) => m.status === "scheduled")
+      .map((m) => {
+        let platform: MeetingPlatform = m.meetingType === "zoom" ? "zoom" : "google_meet";
+        let joinUrl = m.externalMeetingUrl || "";
+        
+        if (!joinUrl && m.description) {
+          const meetMatch = m.description.match(/Join link:\s*(https?:\/\/[^\s]+)/);
+          const platformMatch = m.description.match(/Platform:\s*(\w+)/);
+          if (meetMatch) {
+            joinUrl = meetMatch[1];
+          }
+          if (platformMatch && platformMatch[1].toLowerCase().includes("zoom")) {
+            platform = "zoom";
+          }
+        }
 
-  const removeEvent = (id: string) =>
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+        return {
+          id: String(m.id),
+          title: m.title,
+          start: m.startedAt || m.createdAt,
+          end: m.endedAt || m.createdAt,
+          source: "internal" as const,
+          status: "confirmed" as const,
+          color: (platform === "zoom" ? "purple" : "green") as any,
+          isMeeting: true,
+          platform,
+          joinUrl,
+          location: platform === "zoom" ? "Zoom" : "Google Meet",
+        };
+      });
+  }, [meetings]);
+
+  const addEvent = (e: CalEvent) => {
+    const updated = [e, ...localEvents];
+    setLocalEvents(updated);
+    localStorage.setItem("meeteller-calendar-events", JSON.stringify(updated));
+  };
+
+  const updateEvent = (id: string, patch: Partial<CalEvent>) => {
+    const updated = localEvents.map((e) => (e.id === id ? { ...e, ...patch } : e));
+    setLocalEvents(updated);
+    localStorage.setItem("meeteller-calendar-events", JSON.stringify(updated));
+  };
+
+  const removeEvent = (id: string) => {
+    const updated = localEvents.filter((e) => e.id !== id);
+    setLocalEvents(updated);
+    localStorage.setItem("meeteller-calendar-events", JSON.stringify(updated));
+  };
+
+  const events = useMemo(() => {
+    return [...dbEvents, ...localEvents];
+  }, [dbEvents, localEvents]);
 
   const value = useMemo(
     () => ({ events, addEvent, updateEvent, removeEvent }),

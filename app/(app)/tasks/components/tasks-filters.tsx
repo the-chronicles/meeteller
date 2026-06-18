@@ -33,7 +33,7 @@ export function TasksFilters({
         <select
           value={range}
           onChange={(e) => setRange(e.target.value as RangeKey)}
-          className="px-3 py-2 border rounded-lg text-sm bg-white dark:bg-[#0a0014]"
+          className="rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#282828]"
         >
           <option value="7">Last 7 days</option>
           <option value="30">Last 30 days</option>
@@ -44,7 +44,7 @@ export function TasksFilters({
         <select
           value={assigneeFilter}
           onChange={(e) => setAssigneeFilter(e.target.value as "all" | "me")}
-          className="px-3 py-2 border rounded-lg text-sm bg-white dark:bg-[#0a0014]"
+          className="rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#282828]"
         >
           <option value="all">All tasks</option>
           <option value="me">Assigned to me</option>
@@ -53,7 +53,7 @@ export function TasksFilters({
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as any)}
-          className="px-3 py-2 border rounded-lg text-sm bg-white dark:bg-[#0a0014]"
+          className="rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#282828]"
         >
           <option value="all">Status: All</option>
           <option value="Todo">Todo</option>
@@ -64,7 +64,7 @@ export function TasksFilters({
         <select
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value as any)}
-          className="px-3 py-2 border rounded-lg text-sm bg-white dark:bg-[#0a0014]"
+          className="rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#282828]"
         >
           <option value="all">Priority: Any</option>
           <option value="High">High</option>
@@ -79,8 +79,7 @@ export function TasksFilters({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search tasks..."
-          className="w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none
-                     focus:ring-2 focus:ring-black/10 dark:bg-[#0a0014]"
+          className="w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black/10 dark:bg-[#282828]"
         />
       </div>
     </div>

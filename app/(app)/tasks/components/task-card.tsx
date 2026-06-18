@@ -1,7 +1,28 @@
 "use client";
 
-import { Calendar } from "lucide-react";
 import { Task } from "./types";
+
+function getOrdinalSuffix(day: number) {
+  if (day > 3 && day < 21) return "th";
+  switch (day % 10) {
+    case 1:  return "st";
+    case 2:  return "nd";
+    case 3:  return "rd";
+    default: return "th";
+  }
+}
+
+function formatOrdinalDate(dateStr: string) {
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const suffix = getOrdinalSuffix(day);
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const month = monthNames[date.getMonth()];
+  return `${day}${suffix} ${month}`;
+}
 
 export function TaskCard({
   task,
@@ -14,10 +35,10 @@ export function TaskCard({
 }) {
   const priorityColor =
     task.priority === "High"
-      ? "text-red-600"
+      ? "text-red-600 dark:text-red-400"
       : task.priority === "Medium"
-        ? "text-orange-600"
-        : "text-blue-600";
+        ? "text-orange-600 dark:text-orange-400"
+        : "text-blue-600 dark:text-blue-400";
 
   return (
     <div
@@ -26,38 +47,24 @@ export function TaskCard({
       tabIndex={0}
       onClick={() => onOpen(task)}
       onKeyDown={(e) => e.key === "Enter" && onOpen(task)}
-      className="flex cursor-pointer items-start justify-between rounded-xl border bg-white p-3 transition hover:shadow-sm dark:bg-[#0a0014]"
+      className="flex cursor-pointer flex-col rounded-xl border border-gray-200 bg-white p-3.5 transition hover:bg-gray-50 hover:shadow-xs dark:border-white/10 dark:bg-[#1f1f1f] dark:hover:bg-white/5 text-left w-full space-y-1.5"
     >
-      <div className="space-y-1">
-        <h3 className="font-medium">{task.title}</h3>
+      <h3 className="font-semibold text-sm text-gray-900 dark:text-white leading-tight">
+        {task.title}
+      </h3>
 
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          {task.meeting ? (
-            <>
-              From <span className="font-medium">{task.meeting}</span>
-            </>
-          ) : (
-            <span className="font-medium">Manual task</span>
-          )}
-        </p>
-
-        <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-          <span>Assigned to {task.assignee}</span>
-          <span className={priorityColor}>{task.priority} priority</span>
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-700 dark:bg-white/10 dark:text-gray-200">
-            {task.status}
-          </span>
-        </div>
+      <div className="flex flex-wrap items-center gap-1.5 text-xs text-gray-500 dark:text-zinc-400 leading-none">
+        <span>{formatOrdinalDate(task.dueISO)}</span>
+        <span>•</span>
+        <span className={`${priorityColor} font-medium`}>{task.priority}</span>
       </div>
 
-      <div className="flex shrink-0 items-center gap-1 text-xs whitespace-nowrap text-gray-500 dark:text-gray-400">
-        <Calendar size={14} className="shrink-0" />
-        <span className="leading-none">
-          {new Date(task.dueISO).toLocaleDateString(undefined, {
-            month: "short",
-            day: "numeric",
-          })}
+      <div className="flex flex-wrap items-center gap-1.5 text-xs text-gray-400 dark:text-zinc-500 leading-none">
+        <span className="truncate max-w-[150px]">
+          {task.meeting || "Manual task"}
         </span>
+        <span>•</span>
+        <span className="truncate max-w-[120px]">{task.assignee}</span>
       </div>
     </div>
   );

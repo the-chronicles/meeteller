@@ -34,4 +34,16 @@ export interface Meeting {
   createdAt: string;
 
   updatedAt: string;
+
+  meetingType?: string;
+  externalMeetingUrl?: string;
+
+  insights?: {
+    id: number;
+    summary: string;
+    actionItems: string[];
+    keyDecisions: string[];
+    suggestedTitle?: string;
+    tags?: string[];
+  } | null;
 }

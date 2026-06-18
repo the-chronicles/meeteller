@@ -1,10 +1,9 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { Share2, Link as LinkIcon, FileDown, X } from "lucide-react";
+import { Share2, Link as LinkIcon, FileDown, X, ArrowLeft, Trash2, Play } from "lucide-react";
 import { toast } from "sonner";
-
-import { Trash2 } from "lucide-react";
+import Link from "next/link";
 
 import { useDeleteMeeting } from "@/hooks/useDeleteMeeting";
 
@@ -15,7 +14,38 @@ type Meeting = {
   meetingName: string;
   dateLabel: string;
   durationLabel: string;
+  createdAt?: string;
 };
+
+function getOrdinalSuffix(day: number) {
+  if (day > 3 && day < 21) return "th";
+  switch (day % 10) {
+    case 1:  return "st";
+    case 2:  return "nd";
+    case 3:  return "rd";
+    default: return "th";
+  }
+}
+
+function formatAppleNotesDate(date: Date) {
+  const day = date.getDate();
+  const suffix = getOrdinalSuffix(day);
+  
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const month = monthNames[date.getMonth()];
+  const year = date.getFullYear();
+  
+  let hours = date.getHours();
+  const minutes = date.getMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12;
+  hours = hours ? hours : 12;
+  
+  return `${day}${suffix} ${month} ${year} at ${hours}:${minutes} ${ampm}`;
+}
 
 export function MeetingHeader({ meeting }: { meeting: Meeting }) {
   const [open, setOpen] = useState(false);
@@ -170,34 +200,43 @@ export function MeetingHeader({ meeting }: { meeting: Meeting }) {
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-[#0a0014]">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {meeting.title}
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {meeting.subtitle}
-          </p>
+    <div className="w-full bg-transparent py-3">
+      <div className="flex items-center justify-between gap-4">
+        <Link
+          href="/meetings"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+        >
+          <ArrowLeft size={20} />
+        </Link>
+
+        {/* Date and time like Apple Notes */}
+        <div className="text-xs font-normal text-gray-400 dark:text-zinc-500 select-none">
+          {meeting.createdAt ? formatAppleNotesDate(new Date(meeting.createdAt)) : meeting.dateLabel}
         </div>
 
         <div className="relative flex items-center gap-2" ref={panelRef}>
           <button
-            onClick={() => setOpen((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium hover:bg-gray-50 dark:bg-[#0a0014] dark:border-white/10 dark:text-white dark:hover:bg-white/5"
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            title="Playback"
           >
-            <Share2 size={16} />
-            Share
+            <Play size={18} />
+          </button>
+
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            title="Share"
+          >
+            <Share2 size={18} />
           </button>
 
           <button
             onClick={() => deleteMeeting(meeting.id)}
             disabled={deletingMeeting}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-60 dark:hover:bg-red-500/10"
+            className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 text-red-600 disabled:opacity-60 transition-colors"
+            title={deletingMeeting ? "Deleting..." : "Delete"}
           >
-            <Trash2 size={16} />
-
-            {deletingMeeting ? "Deleting..." : "Delete"}
+            <Trash2 size={18} />
           </button>
 
           {open && (

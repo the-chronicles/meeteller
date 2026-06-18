@@ -1,69 +1,112 @@
 "use client";
 
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
-
-const INTEGRATIONS = [
-  {
-    id: "google-meet",
-    name: "Google Meet",
-    description: "Schedule and join meetings automatically.",
-    icon: "/integrations/gmeet.png",
-    connected: true,
-  },
-  {
-    id: "slack",
-    name: "Slack",
-    description: "Get meeting reminders and updates in Slack.",
-    icon: "/integrations/slacked.png",
-    connected: true,
-  },
-  {
-    id: "zoom",
-    name: "Zoom",
-    description: "Create and manage Zoom meetings.",
-    icon: "/integrations/zoom.png",
-    connected: false,
-  },
-  {
-    id: "microsoft-teams",
-    name: "Microsoft Teams",
-    description: "Sync meetings with Microsoft Teams.",
-    icon: "/integrations/teams.png",
-    connected: false,
-  },
-  {
-    id: "discord",
-    name: "Discord",
-    description: "Send notifications to Discord servers.",
-    icon: "/integrations/discord.png",
-    connected: false,
-  },
-];
+import api from "@/lib/api";
 
 export default function IntegrationsSettings() {
-  const [apps, setApps] = useState(INTEGRATIONS);
+  const [connectedProviders, setConnectedProviders] = useState<{ google: boolean; zoom: boolean }>({
+    google: false,
+    zoom: false,
+  });
+  const [loading, setLoading] = useState(true);
 
-  const toggleIntegration = (id: string) => {
-    const app = apps.find((item) => item.id === id);
+  useEffect(() => {
+    // Check callback status query params
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("google") === "success") {
+      toast.success("Google Meet integration connected successfully!");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else if (params.get("zoom") === "success") {
+      toast.success("Zoom integration connected successfully!");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
 
-    if (!app) return;
+    // Fetch integration statuses
+    api.get("/integrations")
+      .then((res) => {
+        setConnectedProviders(res.data);
+      })
+      .catch(() => {
+        console.error("Failed to load integrations connection status.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
-    setApps((prev) =>
-      prev.map((app) =>
-        app.id === id ? { ...app, connected: !app.connected } : app,
-      ),
-    );
+  const apps = [
+    {
+      id: "google-meet",
+      providerKey: "google",
+      name: "Google Meet",
+      description: "Schedule and join meetings automatically.",
+      icon: "/integrations/gmeet.png",
+      connected: connectedProviders.google,
+    },
+    {
+      id: "zoom",
+      providerKey: "zoom",
+      name: "Zoom",
+      description: "Create and manage Zoom meetings.",
+      icon: "/integrations/zoom.png",
+      connected: connectedProviders.zoom,
+    },
+    {
+      id: "slack",
+      providerKey: "slack",
+      name: "Slack",
+      description: "Get meeting reminders and updates in Slack.",
+      icon: "/integrations/slacked.png",
+      connected: true, // Mocked for UI
+    },
+    {
+      id: "microsoft-teams",
+      providerKey: "microsoft",
+      name: "Microsoft Teams",
+      description: "Sync meetings with Microsoft Teams.",
+      icon: "/integrations/teams.png",
+      connected: false,
+    },
+    {
+      id: "discord",
+      providerKey: "discord",
+      name: "Discord",
+      description: "Send notifications to Discord servers.",
+      icon: "/integrations/discord.png",
+      connected: false,
+    },
+  ];
 
-    toast.success(
-      `${app.name} ${app.connected ? "disconnected" : "connected"}.`,
-    );
+  const toggleIntegration = async (id: string, providerKey: string, connected: boolean) => {
+    if (providerKey !== "google" && providerKey !== "zoom") {
+      toast.info(`${id} toggle is a placeholder. Only Google Meet and Zoom are functional.`);
+      return;
+    }
 
-    // 👉 Later:
-    // if connecting → redirect to OAuth
-    // if disconnecting → revoke token
+    if (connected) {
+      // Disconnect
+      try {
+        await api.delete(`/integrations/${providerKey}`);
+        setConnectedProviders((prev) => ({ ...prev, [providerKey]: false }));
+        toast.success(`Disconnected from ${providerKey === "google" ? "Google Meet" : "Zoom"}.`);
+      } catch {
+        toast.error(`Failed to disconnect from ${providerKey === "google" ? "Google Meet" : "Zoom"}.`);
+      }
+    } else {
+      // Connect
+      try {
+        const response = await api.get(`/integrations/${providerKey}/auth`);
+        if (response.data?.url) {
+          window.location.href = response.data.url;
+        } else {
+          throw new Error("No URL returned from backend.");
+        }
+      } catch {
+        toast.error(`Failed to initiate ${providerKey === "google" ? "Google Meet" : "Zoom"} connection.`);
+      }
+    }
   };
 
   return (
@@ -115,7 +158,8 @@ export default function IntegrationsSettings() {
               )}
 
               <button
-                onClick={() => toggleIntegration(app.id)}
+                onClick={() => toggleIntegration(app.id, app.providerKey, app.connected)}
+                disabled={loading && (app.providerKey === "google" || app.providerKey === "zoom")}
                 className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                   app.connected
                     ? "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:bg-zinc-800 dark:border-white/10 dark:text-gray-300 dark:hover:bg-zinc-700"

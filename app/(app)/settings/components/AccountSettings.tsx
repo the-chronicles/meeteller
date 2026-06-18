@@ -193,7 +193,7 @@ export default function AccountSettings() {
   return (
     <section className="mx-auto w-full max-w-4xl space-y-8">
       {/* Header */}
-      <div>
+      {/* <div>
         <h1 className="font-helvetica text-2xl font-semibold text-gray-900 dark:text-white">
           Profile Settings
         </h1>
@@ -201,7 +201,7 @@ export default function AccountSettings() {
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
           Manage your profile information and preferences.
         </p>
-      </div>
+      </div> */}
 
       {/* Profile Card */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/5">
@@ -296,7 +296,7 @@ export default function AccountSettings() {
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="flex h-12 items-center gap-2 rounded-xl bg-purple-600 px-6 text-sm font-medium text-white transition hover:bg-purple-700 disabled:opacity-60"
+            className="flex h-12 items-center gap-2 rounded-xl bg-[#5b09c4] px-6 text-sm font-medium text-white transition hover:bg-purple-700 disabled:opacity-60"
           >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />

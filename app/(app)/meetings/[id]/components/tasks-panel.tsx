@@ -33,7 +33,7 @@ export function TasksPanel({
         {items.map((t) => (
           <div
             key={t.id}
-            className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-[#0a0014]"
+            className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-[#282828]"
           >
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-gray-900 dark:text-white">

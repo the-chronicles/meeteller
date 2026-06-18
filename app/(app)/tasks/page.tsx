@@ -10,12 +10,16 @@ export default function TasksPage() {
   const [range, setRange] = useState<RangeKey>("30");
 
   const [assigneeFilter, setAssigneeFilter] = useState<"all" | "me">("all");
-  const [statusFilter, setStatusFilter] = useState<"all" | "Todo" | "In Progress" | "Done">("all");
-  const [priorityFilter, setPriorityFilter] = useState<"all" | "High" | "Medium" | "Low">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "Todo" | "In Progress" | "Done"
+  >("all");
+  const [priorityFilter, setPriorityFilter] = useState<
+    "all" | "High" | "Medium" | "Low"
+  >("all");
 
   return (
     <div className="space-y-6">
-      <TasksHeader />
+      {/* <TasksHeader /> */}
 
       <TasksFilters
         search={search}

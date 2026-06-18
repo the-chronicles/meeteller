@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { TaskCard } from "./task-card";
 import type { Priority, Task, TaskStatus } from "./types";
 import type { RangeKey } from "./tasks-filters";
+import { useTasks } from "@/hooks/useTasks";
 
 type LaneKey = Priority | "Completed";
 
@@ -50,63 +51,6 @@ const LANES: {
   },
 ];
 
-const initialTasks: Task[] = [
-  {
-    id: 1,
-    title: "Prepare taxation by-law",
-    meeting: "Budget Planning Meeting",
-    assignee: "CFO",
-    priority: "High",
-    status: "Todo",
-    dueISO: new Date(Date.now() + 5 * 86400000).toISOString(),
-    description: "Draft the by-law and share with legal for review.",
-    origin: "meeting",
-  },
-  {
-    id: 2,
-    title: "Improve public engagement process",
-    meeting: "Council Review",
-    assignee: "Council",
-    priority: "Medium",
-    status: "In Progress",
-    dueISO: new Date(Date.now() + 9 * 86400000).toISOString(),
-    description: "Define outreach flow and publish comms timeline.",
-    origin: "meeting",
-  },
-  {
-    id: 3,
-    title: "Send follow-up notes to stakeholders",
-    meeting: "Town Hall",
-    assignee: "Comms",
-    priority: "Low",
-    status: "Todo",
-    dueISO: new Date(Date.now() + 12 * 86400000).toISOString(),
-    description: "Summarize outcomes, action items, and next steps.",
-    origin: "meeting",
-  },
-  {
-    id: 4,
-    title: "Finalize Q2 roadmap draft",
-    meeting: "Weekly Product Sync",
-    assignee: "PM",
-    priority: "High",
-    status: "In Progress",
-    dueISO: new Date(Date.now() + 2 * 86400000).toISOString(),
-    description: "Lock scope and send for leadership sign-off.",
-    origin: "meeting",
-  },
-  {
-    id: 5,
-    title: "Ship weekly report",
-    assignee: "CFO",
-    priority: "Low",
-    status: "Done",
-    dueISO: new Date(Date.now() - 1 * 86400000).toISOString(),
-    description: "Send summary report to leadership.",
-    origin: "manual",
-  },
-];
-
 function withinRange(dueISO: string, range: RangeKey) {
   if (range === "all") return true;
   const days = Number(range);
@@ -114,10 +58,6 @@ function withinRange(dueISO: string, range: RangeKey) {
   const due = new Date(dueISO).getTime();
   const diffDays = Math.floor((due - now) / 86400000);
   return diffDays <= days;
-}
-
-function nextId(tasks: Task[]) {
-  return (tasks.reduce((m, t) => Math.max(m, t.id), 0) || 0) + 1;
 }
 
 export function TasksTable({
@@ -133,8 +73,9 @@ export function TasksTable({
   statusFilter: "all" | TaskStatus;
   priorityFilter: "all" | Priority;
 }) {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const { tasks, isLoading, createTask, updateTask, deleteTask } = useTasks();
   const [selected, setSelected] = useState<Task | null>(null);
+  const [draggedOverLane, setDraggedOverLane] = useState<LaneKey | null>(null);
 
   // Create task modal
   const [showCreate, setShowCreate] = useState(false);
@@ -209,33 +150,25 @@ export function TasksTable({
   // ---------------------------
   // Drag & Drop
   // ---------------------------
-  const onDragStart = (taskId: number) => (e: React.DragEvent) => {
-    e.dataTransfer.setData("text/taskId", String(taskId));
+  const onDragStart = (taskId: string) => (e: React.DragEvent) => {
+    e.dataTransfer.setData("text/taskId", taskId);
     e.dataTransfer.effectAllowed = "move";
   };
 
   const onDropToLane = (lane: LaneKey) => (e: React.DragEvent) => {
     e.preventDefault();
-    const id = Number(e.dataTransfer.getData("text/taskId"));
+    const id = e.dataTransfer.getData("text/taskId");
     if (!id) return;
 
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id !== id) return t;
-
-        // Dropping into Completed forces Done
-        if (lane === "Completed") {
-          return { ...t, status: "Done" };
-        }
-
-        // Dropping into priority lanes sets priority, and if it was Done, bring it back to Todo
-        return {
-          ...t,
-          priority: lane,
-          status: t.status === "Done" ? "Todo" : t.status,
-        };
-      }),
-    );
+    if (lane === "Completed") {
+      updateTask(id, { status: "Done" });
+    } else {
+      const task = tasks.find((t) => t.id === id);
+      updateTask(id, {
+        priority: lane,
+        status: task?.status === "Done" ? "Todo" : task?.status,
+      });
+    }
   };
 
   const onDragOver = (e: React.DragEvent) => e.preventDefault();
@@ -247,12 +180,12 @@ export function TasksTable({
     if (!selected) return;
     const merged = { ...selected, ...patch };
     setSelected(merged);
-    setTasks((prev) => prev.map((t) => (t.id === selected.id ? merged : t)));
+    updateTask(selected.id, patch);
   };
 
   const deleteSelected = () => {
     if (!selected) return;
-    setTasks((prev) => prev.filter((t) => t.id !== selected.id));
+    deleteTask(selected.id);
     setSelected(null);
     toast.success("Task deleted.");
   };
@@ -260,7 +193,7 @@ export function TasksTable({
   // ---------------------------
   // Create task
   // ---------------------------
-  const createTask = () => {
+  const handleCreateTask = () => {
     if (!newTask.title.trim()) {
       toast.error("Enter a task title.");
       return;
@@ -268,19 +201,14 @@ export function TasksTable({
 
     const dueISO = new Date(newTask.due).toISOString();
 
-    setTasks((prev) => [
-      {
-        id: nextId(prev),
-        title: newTask.title.trim(),
-        description: newTask.description.trim() || undefined,
-        assignee: newTask.assignee.trim() || myName,
-        priority: newTask.priority,
-        status: newTask.status,
-        dueISO,
-        origin: "manual",
-      },
-      ...prev,
-    ]);
+    createTask({
+      title: newTask.title.trim(),
+      description: newTask.description.trim() || undefined,
+      assignee: newTask.assignee.trim() || myName,
+      priority: newTask.priority,
+      status: newTask.status,
+      dueISO,
+    });
 
     setShowCreate(false);
     setNewTask((v) => ({
@@ -311,53 +239,94 @@ export function TasksTable({
       </div>
 
       {/* Board */}
-      <div className="grid gap-4 lg:grid-cols-4">
-        {LANES.map((col) => (
-          <section
-            key={col.key}
-            onDrop={onDropToLane(col.key)}
-            onDragOver={onDragOver}
-            className={`rounded-2xl border ${col.border} overflow-hidden bg-white dark:bg-[#0a0014]`}
-          >
-            {/* Sticky colored header */}
-            <div
-              className={`sticky top-0 z-10 ${col.headerBg} px-4 py-4 text-white`}
+      <div className="grid items-start gap-4 lg:grid-cols-4">
+        {LANES.map((col) => {
+          const isExpanded =
+            grouped[col.key].length > 0 || draggedOverLane === col.key;
+
+          return (
+            <section
+              key={col.key}
+              onDragOver={(e) => {
+                e.preventDefault();
+                if (draggedOverLane !== col.key) {
+                  setDraggedOverLane(col.key);
+                }
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                const rect = e.currentTarget.getBoundingClientRect();
+                if (
+                  e.clientX < rect.left ||
+                  e.clientX >= rect.right ||
+                  e.clientY < rect.top ||
+                  e.clientY >= rect.bottom
+                ) {
+                  setDraggedOverLane(null);
+                }
+              }}
+              onDrop={(e) => {
+                onDropToLane(col.key)(e);
+                setDraggedOverLane(null);
+              }}
+              className={`rounded-2xl border ${col.border} overflow-hidden bg-white transition-all duration-300 dark:bg-[#282828]`}
             >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-medium">{col.title}</p>
-                  <p className="text-xs opacity-90">{col.subtitle}</p>
-                </div>
-                <div className="text-3xl leading-none font-semibold">
-                  {counts[col.key]}
+              {/* Sticky colored header */}
+              <div
+                className={`sticky top-0 z-10 ${col.headerBg} px-4 py-4 text-white`}
+              >
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-medium">{col.title}</p>
+                    <p className="text-xs opacity-90">{col.subtitle}</p>
+                  </div>
+                  <div className="text-3xl leading-none font-semibold">
+                    {counts[col.key]}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Column body (scroll) */}
-            <div className={`p-4 ${col.tint} dark:bg-transparent`}>
-              <div className="h-[calc(100vh-360px)] space-y-3 overflow-y-auto pr-1">
-                {grouped[col.key].length === 0 ? (
-                  <div className="rounded-xl border border-dashed bg-white/70 p-4 text-sm text-gray-500 dark:bg-white/5 dark:text-gray-300">
-                    Drop tasks here.
+              {/* Column body (scroll inside) */}
+              <div
+                className={`transition-all duration-300 ${col.tint} dark:bg-transparent ${
+                  isExpanded ? "p-4" : "p-0"
+                }`}
+              >
+                <div
+                  className={`transition-all duration-300 ${
+                    isExpanded
+                      ? "max-h-[500px] min-h-[100px] space-y-3 overflow-y-auto pr-1"
+                      : "h-0 overflow-hidden"
+                  }`}
+                >
+                  {grouped[col.key].length === 0 ? (
+                    <div className="flex h-[80px] items-center justify-center rounded-xl border-2 border-dashed border-gray-400 bg-white/50 text-xs text-gray-500 dark:border-zinc-500 dark:bg-white/5 dark:text-zinc-400">
+                      Drop to add task
+                    </div>
+                  ) : (
+                    grouped[col.key].map((task) => (
+                      <TaskCard
+                        key={task.id}
+                        task={task}
+                        onOpen={setSelected}
+                        draggableProps={{
+                          draggable: true,
+                          onDragStart: onDragStart(task.id),
+                        }}
+                      />
+                    ))
+                  )}
+                </div>
+
+                {!isExpanded && (
+                  <div className="m-4 flex h-[70px] items-center justify-center rounded-xl border-2 border-dashed border-gray-300 text-xs font-medium text-gray-400 select-none dark:border-zinc-700 dark:text-zinc-500">
+                    Drop tasks here
                   </div>
-                ) : (
-                  grouped[col.key].map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      onOpen={setSelected}
-                      draggableProps={{
-                        draggable: true,
-                        onDragStart: onDragStart(task.id),
-                      }}
-                    />
-                  ))
                 )}
               </div>
-            </div>
-          </section>
-        ))}
+            </section>
+          );
+        })}
       </div>
 
       {/* Create modal */}
@@ -368,7 +337,7 @@ export function TasksTable({
             onClick={() => setShowCreate(false)}
           />
           <div className="relative w-full max-w-lg rounded-2xl bg-white p-5 shadow-xl dark:bg-[#0a0014]">
-            <div className="flex items-start justify-between">
+            {/* <div className="flex items-start justify-between">
               <div>
                 <h3 className="text-lg font-semibold">Create task</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -381,25 +350,25 @@ export function TasksTable({
               >
                 Close
               </button>
-            </div>
+            </div> */}
 
             <div className="mt-4 space-y-3">
               <div>
-                <label className="text-xs text-gray-500">Title</label>
+                {/* <label className="text-xs text-gray-500">Title</label> */}
                 <input
                   value={newTask.title}
                   onChange={(e) =>
                     setNewTask((v) => ({ ...v, title: e.target.value }))
                   }
                   className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
-                  placeholder="e.g. Follow up with client"
+                  placeholder="Title"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-gray-500">
+                {/* <label className="text-xs text-gray-500">
                   Description (optional)
-                </label>
+                </label> */}
                 <textarea
                   value={newTask.description}
                   onChange={(e) =>
@@ -407,25 +376,25 @@ export function TasksTable({
                   }
                   className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
                   rows={3}
-                  placeholder="Add context..."
+                  placeholder="Description (optional)"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-gray-500">Assignee</label>
+                  {/* <label className="text-xs text-gray-500">Assignee</label> */}
                   <input
                     value={newTask.assignee}
                     onChange={(e) =>
                       setNewTask((v) => ({ ...v, assignee: e.target.value }))
                     }
                     className="mt-1 w-full rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#0a0014]"
-                    placeholder="e.g. CFO"
+                    placeholder="Assignee"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs text-gray-500">Due date</label>
+                  {/* <label className="text-xs text-gray-500">Due date</label> */}
                   <input
                     type="date"
                     value={newTask.due}
@@ -437,7 +406,7 @@ export function TasksTable({
                 </div>
 
                 <div>
-                  <label className="text-xs text-gray-500">Priority</label>
+                  {/* <label className="text-xs text-gray-500">Priority</label> */}
                   <select
                     value={newTask.priority}
                     onChange={(e) =>
@@ -455,7 +424,7 @@ export function TasksTable({
                 </div>
 
                 <div>
-                  <label className="text-xs text-gray-500">Status</label>
+                  {/* <label className="text-xs text-gray-500">Status</label> */}
                   <select
                     value={newTask.status}
                     onChange={(e) =>
@@ -475,7 +444,7 @@ export function TasksTable({
 
               <div className="flex gap-2 pt-2">
                 <button
-                  onClick={createTask}
+                  onClick={handleCreateTask}
                   className="flex-1 rounded-lg bg-[#5b09c4] px-4 py-2 text-sm font-medium text-white"
                 >
                   Create task

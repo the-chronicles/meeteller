@@ -71,8 +71,8 @@ const teamFeatures = [
 
 export default function TeamsPage() {
   const router = useRouter();
-  const hasTeamsAccess = true;
-  //   const hasTeamsAccess = false;
+  // const hasTeamsAccess = true;
+  const hasTeamsAccess = false;
 
   const [inviteOpen, setInviteOpen] = useState(false);
   const [invites, setInvites] = useState<Invitation[]>([

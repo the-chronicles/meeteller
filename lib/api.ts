@@ -47,7 +47,15 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("access_token");
 
-      window.location.href = "/login";
+      if (typeof window !== "undefined") {
+        const path = window.location.pathname;
+        const publicRoutes = ["/login", "/signup", "/pricing", "/faqs", "/privacy-policy", "/terms", "/terms&conditions"];
+        const isPublic = publicRoutes.some((route) => path.startsWith(route)) || path === "/";
+
+        if (!isPublic) {
+          window.location.href = "/login";
+        }
+      }
     }
 
     return Promise.reject(error);

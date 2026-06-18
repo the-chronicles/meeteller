@@ -18,7 +18,7 @@ export function DashboardGreeting() {
         : "Good evening";
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white/40 p-8 backdrop-blur-xl md:p-40 dark:border-white/10 dark:bg-[#0a0014]/40">
+    <div className="relative overflow-hidden rounded-2xl border border-gray-100 bg-white/40 p-8 backdrop-blur-xl md:p-40 dark:border-white/10 dark:bg-[#282828]">
       {/* <AudioWaveCanvas /> */}
 
       <div className="relative z-10 space-y-4 text-center">

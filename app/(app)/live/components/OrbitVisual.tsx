@@ -1,19 +1,18 @@
 export default function OrbitVisual() {
   return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-      
+    <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
       {/* Voice ripples */}
-      <div className="absolute h-[220px] w-[220px] rounded-full border border-purple-300 animate-ripple" />
-      <div className="absolute h-[220px] w-[220px] rounded-full border border-blue-300 animate-ripple delay-1000" />
+      <div className="animate-ripple absolute h-[220px] w-[220px] rounded-full border border-red-300" />
+      <div className="animate-ripple absolute h-[220px] w-[220px] rounded-full border border-red-200 delay-1000" />
 
       {/* Orbit rings */}
-      <div className="absolute h-[380px] w-[380px] rounded-full border border-purple-200 opacity-40 animate-spin-slow" />
-      <div className="absolute h-[260px] w-[260px] rounded-full border border-blue-200 opacity-50 animate-spin-reverse" />
+      <div className="animate-spin-slow absolute h-[380px] w-[380px] rounded-full border border-red-200 opacity-40" />
+      <div className="animate-spin-reverse absolute h-[260px] w-[260px] rounded-full border border-red-200 opacity-50" />
 
       {/* Core speaking pulse */}
-      <div className="relative flex items-center justify-center animate-float">
-        <div className="absolute h-28 w-28 rounded-full bg-purple-400/20 blur-xl animate-pulse-soft" />
-        <div className="h-20 w-20 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 shadow-lg animate-pulse-soft" />
+      <div className="animate-float relative flex items-center justify-center">
+        <div className="animate-pulse-soft absolute h-28 w-28 rounded-full bg-red-400/20 blur-xl" />
+        <div className="animate-pulse-soft h-20 w-20 rounded-full bg-gradient-to-br from-red-500 to-red-600 shadow-lg" />
       </div>
 
       {/* Audio wave */}
@@ -24,11 +23,10 @@ export default function OrbitVisual() {
       >
         <path
           d="M0 60 C 240 20, 480 100, 720 60 C 960 20, 1200 100, 1440 60"
-          stroke="#93C5FD"
+          stroke="#282828"
           strokeWidth="2"
         />
       </svg>
-
     </div>
   );
 }
