@@ -37,6 +37,8 @@ export interface Meeting {
 
   meetingType?: string;
   externalMeetingUrl?: string;
+  externalMeetingId?: string;
+  providerMetadata?: string;
 
   insights?: {
     id: number;

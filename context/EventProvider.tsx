@@ -2,6 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useMeetings } from "@/hooks/useMeetings";
+import { useQuery } from "@tanstack/react-query";
+import { syncGoogleCalendar } from "@/services/meeting.service";
 
 export type MeetingPlatform = "google_meet" | "zoom";
 export type CalendarSource = "all" | "google" | "microsoft" | "internal";
@@ -17,11 +19,13 @@ export type CalEvent = {
   color?: "purple" | "blue" | "green" | "yellow" | "pink";
   location?: string;
   attendees?: number;
+  description?: string;
 
   // meeting-only extras
   isMeeting?: boolean;
   platform?: MeetingPlatform;
   joinUrl?: string;
+  externalMeetingId?: string;
 };
 
 type EventsCtx = {
@@ -36,6 +40,47 @@ const EventsContext = createContext<EventsCtx | null>(null);
 export function EventsProvider({ children }: { children: React.ReactNode }) {
   const { data: meetings = [] } = useMeetings();
   const [localEvents, setLocalEvents] = useState<CalEvent[]>([]);
+
+  const hasToken = typeof window !== "undefined" && !!localStorage.getItem("access_token");
+
+  const { data: googleSyncData } = useQuery({
+    queryKey: ["google-calendar-sync"],
+    queryFn: () => syncGoogleCalendar().catch(() => ({ items: [] })),
+    enabled: hasToken,
+    retry: false,
+    refetchInterval: 30000,
+  });
+
+  const googleEvents = useMemo(() => {
+    if (!googleSyncData || !googleSyncData.items || !Array.isArray(googleSyncData.items)) {
+      return [];
+    }
+    // Filter out Google events that are already represented as internal meetings
+    const internalExternalIds = new Set(
+      meetings.map((m) => m.externalMeetingId).filter(Boolean)
+    );
+
+    return googleSyncData.items
+      .filter((item: any) => !internalExternalIds.has(item.id))
+      .map((item: any) => {
+        const start = item.start?.dateTime || item.start?.date || new Date().toISOString();
+        const end = item.end?.dateTime || item.end?.date || new Date().toISOString();
+        return {
+          id: `google-${item.id}`,
+          title: item.summary || "Untitled Event",
+          start,
+          end,
+          source: "google" as const,
+          color: "blue" as const,
+          location: item.location || "Google Meet",
+          description: (item.description && item.description !== "Scheduled via Meeteller") ? item.description : "",
+          isMeeting: !!item.hangoutLink,
+          platform: item.hangoutLink ? ("google_meet" as const) : undefined,
+          joinUrl: item.hangoutLink || "",
+          providerMetadata: JSON.stringify(item),
+        };
+      });
+  }, [googleSyncData, meetings]);
 
   // Load local calendar events on mount
   useEffect(() => {
@@ -81,6 +126,8 @@ export function EventsProvider({ children }: { children: React.ReactNode }) {
           platform,
           joinUrl,
           location: platform === "zoom" ? "Zoom" : "Google Meet",
+          description: m.description,
+          externalMeetingId: m.externalMeetingId,
         };
       });
   }, [meetings]);
@@ -104,8 +151,8 @@ export function EventsProvider({ children }: { children: React.ReactNode }) {
   };
 
   const events = useMemo(() => {
-    return [...dbEvents, ...localEvents];
-  }, [dbEvents, localEvents]);
+    return [...dbEvents, ...googleEvents, ...localEvents];
+  }, [dbEvents, googleEvents, localEvents]);
 
   const value = useMemo(
     () => ({ events, addEvent, updateEvent, removeEvent }),

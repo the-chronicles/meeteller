@@ -35,12 +35,14 @@ export function useMeetingInsights(id: string) {
   });
 }
 
-export function useMeetingTranscript(id: string) {
+export function useMeetingTranscript(id: string, refetchInterval?: number) {
   return useQuery({
     queryKey: ["meeting-transcript", id],
 
     queryFn: () => getMeetingTranscript(id),
 
     enabled: !!id,
+
+    refetchInterval,
   });
 }

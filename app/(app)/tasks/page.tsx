@@ -11,7 +11,7 @@ export default function TasksPage() {
 
   const [assigneeFilter, setAssigneeFilter] = useState<"all" | "me">("all");
   const [statusFilter, setStatusFilter] = useState<
-    "all" | "Todo" | "In Progress" | "Done"
+    "all" | "To Do" | "In Progress" | "Done"
   >("all");
   const [priorityFilter, setPriorityFilter] = useState<
     "all" | "High" | "Medium" | "Low"

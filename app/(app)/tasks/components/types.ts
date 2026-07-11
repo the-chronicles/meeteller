@@ -1,5 +1,5 @@
 export type Priority = "High" | "Medium" | "Low";
-export type TaskStatus = "Todo" | "In Progress" | "Done";
+export type TaskStatus = "To Do" | "In Progress" | "Done";
 
 export type TaskOrigin = "meeting" | "manual";
 

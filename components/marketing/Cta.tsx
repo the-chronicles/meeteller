@@ -48,7 +48,7 @@ export function CTASection() {
           transition={{ duration: 0.7 }}
           viewport={{ once: true }}
         >
-          Ready to Level Up Your Meetings?
+          Be in the meeting. Not in your notes.
         </motion.h2>
 
         {/* Subtitle */}
@@ -59,8 +59,8 @@ export function CTASection() {
           transition={{ duration: 0.7, delay: 0.15 }}
           viewport={{ once: true }}
         >
-          Start using Meeteller today and get accurate notes, real summaries,
-          and prioritized tasks automatically.
+          You didn’t join the meeting to type. Let Meeteller capture everything,
+          so you can stay present
         </motion.p>
 
         {/* CTA BUTTON */}
@@ -74,7 +74,7 @@ export function CTASection() {
             <Button
               asChild
               size="lg"
-              className="text-[#5b09c4] bg-white hover:bg-white/80"
+              className="bg-white text-[#5b09c4] hover:bg-white/80"
             >
               <Link href="/signup">Get Started</Link>
             </Button>

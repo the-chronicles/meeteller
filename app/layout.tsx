@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/context/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import localFont from "next/font/local";
 import QueryProvider from "./providers/query-provider";
+import { DM_Sans } from "next/font/google";
 
 const helvetica = localFont({
   src: [
@@ -26,6 +27,12 @@ const helvetica = localFont({
   ],
   variable: "--font-helvetica",
   display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dm-sans", // Optional: Used for Tailwind CSS integration
 });
 
 const sora = localFont({
@@ -69,7 +76,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${helvetica.variable} ${sora.variable} font-sans`}
+      className={`${helvetica.variable} ${sora.variable} font-sans ${dmSans.variable}`}
     >
       <body className="bg-background text-foreground antialiased">
         <ThemeProvider>

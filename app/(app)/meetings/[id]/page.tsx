@@ -1,10 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 
 import AppLoader from "@/components/ui/AppLoader";
-
-// import { useMeeting } from "@/hooks/useMeeting";
 
 // import { AudioPlayer } from "./components/audio-player";
 
@@ -27,6 +26,75 @@ export default function MeetingDetailPage() {
   const { data: meeting, isLoading } = useMeeting(id);
   const { data: insights } = useMeetingInsights(id);
   const { data: transcriptData } = useMeetingTranscript(id);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [selectedVoiceGender, setSelectedVoiceGender] = useState<
+    "male" | "female"
+  >("female");
+
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [id]);
+
+  const speakText = (text: string, gender: "male" | "female") => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+
+    let selectedVoice = null;
+    if (gender === "male") {
+      selectedVoice = voices.find(
+        (v) =>
+          v.name.toLowerCase().includes("male") ||
+          v.name.toLowerCase().includes("david") ||
+          v.name.toLowerCase().includes("george"),
+      );
+    } else {
+      selectedVoice = voices.find(
+        (v) =>
+          v.name.toLowerCase().includes("female") ||
+          v.name.toLowerCase().includes("zira") ||
+          v.name.toLowerCase().includes("hazel") ||
+          v.name.toLowerCase().includes("google us english"),
+      );
+    }
+
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    }
+
+    utterance.onend = () => {
+      setIsPlaying(false);
+    };
+    utterance.onerror = () => {
+      setIsPlaying(false);
+    };
+
+    window.speechSynthesis.speak(utterance);
+    setIsPlaying(true);
+  };
+
+  const togglePlay = () => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+
+    if (isPlaying) {
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
+    } else {
+      const summaryText =
+        insights?.summary ||
+        meeting?.description ||
+        "No meeting summary available to play.";
+      speakText(summaryText, selectedVoiceGender);
+    }
+  };
 
   if (isLoading) {
     return <AppLoader />;
@@ -57,22 +125,25 @@ export default function MeetingDetailPage() {
         <MeetingHeader
           meeting={{
             id: String(meeting.id),
-
             title: meeting.title,
-
             subtitle: meeting.description || "Meeting details",
-
             meetingName: meeting.title,
-
             dateLabel: new Date(meeting.createdAt).toLocaleDateString(),
-
             durationLabel: meeting.isLive ? "Live" : meeting.status,
-
             createdAt: meeting.createdAt,
           }}
+          isPlaying={isPlaying}
+          onPlayToggle={togglePlay}
         />
 
-        {/* <AudioPlayer /> */}
+        {/* {meeting.status === "completed" && (
+          <AudioPlayer
+            isPlaying={isPlaying}
+            onPlayToggle={togglePlay}
+            voiceGender={selectedVoiceGender}
+            setVoiceGender={setSelectedVoiceGender}
+          />
+        )} */}
 
         <div
           id="meeting-summary"

@@ -21,8 +21,8 @@ export function TasksFilters({
   setRange: (v: RangeKey) => void;
   assigneeFilter: "all" | "me";
   setAssigneeFilter: (v: "all" | "me") => void;
-  statusFilter: "all" | "Todo" | "In Progress" | "Done";
-  setStatusFilter: (v: "all" | "Todo" | "In Progress" | "Done") => void;
+  statusFilter: "all" | "To Do" | "In Progress" | "Done";
+  setStatusFilter: (v: "all" | "To Do" | "In Progress" | "Done") => void;
   priorityFilter: "all" | "High" | "Medium" | "Low";
   setPriorityFilter: (v: "all" | "High" | "Medium" | "Low") => void;
 }) {
@@ -56,7 +56,7 @@ export function TasksFilters({
           className="rounded-lg border bg-white px-3 py-2 text-sm dark:bg-[#282828]"
         >
           <option value="all">Status: All</option>
-          <option value="Todo">Todo</option>
+          <option value="To Do">To Do</option>
           <option value="In Progress">In Progress</option>
           <option value="Done">Done</option>
         </select>

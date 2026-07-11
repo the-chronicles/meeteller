@@ -52,3 +52,9 @@ export const getMeetingTranscript = async (id: string): Promise<any> => {
 
   return response.data;
 };
+
+export const syncGoogleCalendar = async (): Promise<any> => {
+  const response = await api.get("/integrations/sync");
+
+  return response.data;
+};

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useMeetings } from "@/hooks/useMeetings";
 
 export type Priority = "High" | "Medium" | "Low";
-export type TaskStatus = "Todo" | "In Progress" | "Done";
+export type TaskStatus = "To Do" | "In Progress" | "Done";
 
 export interface Task {
   id: string; // "ai-[meetingId]-[index]" or "manual-[id]"
@@ -34,7 +34,7 @@ export function useTasks() {
             id: `ai-${meeting.id}-${index}`,
             title: item,
             priority: "Medium",
-            status: "Todo",
+            status: "To Do",
             dueISO: meeting.createdAt || new Date().toISOString(),
             assignee: meeting.owner?.name || "CFO",
             meeting: meeting.title,
@@ -51,13 +51,26 @@ export function useTasks() {
     try {
       const savedManual = localStorage.getItem("meeteller-manual-tasks");
       if (savedManual) {
-        setManualTasks(JSON.parse(savedManual));
+        const parsed = JSON.parse(savedManual) as Task[];
+        const mapped = parsed.map((t) => ({
+          ...t,
+          status: (t.status as string) === "Todo" ? ("To Do" as const) : t.status,
+        }));
+        setManualTasks(mapped);
       } else {
         setManualTasks([]);
       }
       const savedOverrides = localStorage.getItem("meeteller-task-overrides");
       if (savedOverrides) {
-        setOverrides(JSON.parse(savedOverrides));
+        const parsed = JSON.parse(savedOverrides) as Record<string, Partial<Task>>;
+        const mapped: Record<string, Partial<Task>> = {};
+        Object.entries(parsed).forEach(([key, val]) => {
+          mapped[key] = {
+            ...val,
+            status: (val.status as string) === "Todo" ? "To Do" : val.status,
+          };
+        });
+        setOverrides(mapped);
       } else {
         setOverrides({});
       }

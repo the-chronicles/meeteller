@@ -23,7 +23,7 @@ export const Footer = () => {
       </motion.div>
 
       {/* TOP SECTION */}
-      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-2 gap-12 px-6 md:grid-cols-4">
+      <div className="relative z-10 mx-auto grid max-w-7xl grid-cols-2 gap-12 px-6 md:grid-cols-3">
         {/* LOGO */}
         <motion.div
           className="col-span-2 md:col-span-1"
@@ -44,14 +44,6 @@ export const Footer = () => {
         {/* LINKS — Stagger Animation */}
         {[
           {
-            title: "How It Works",
-            links: [""],
-          },
-          {
-            title: "Pricing",
-            links: ["Individual", "Teams"],
-          },
-          {
             title: "Download",
             links: [
               "iOS app (Coming Soon)",
@@ -60,6 +52,10 @@ export const Footer = () => {
               "Desktop (Coming Soon)",
             ],
           },
+          {
+            title: "Legal",
+            links: ["Privacy Policy", "Terms of Service"],
+          },
         ].map((section, idx) => (
           <motion.div
             key={idx}
@@ -67,6 +63,7 @@ export const Footer = () => {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: idx * 0.15 }}
             viewport={{ once: true }}
+            className="justify-self-end"
           >
             <h4 className="mb-4 font-medium text-white">{section.title}</h4>
 
@@ -113,19 +110,17 @@ export const Footer = () => {
         <p>© {new Date().getFullYear()} Meeteller</p>
 
         <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-          {["Privacy policy", "Terms of service", "Cookie settings"].map(
-            (item, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ x: 5, opacity: 0.9 }}
-                transition={{ duration: 0.25 }}
-              >
-                <Link href="" className="hover:text-gray-300">
-                  {item}
-                </Link>
-              </motion.div>
-            ),
-          )}
+          {["Cookie settings"].map((item, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ x: 5, opacity: 0.9 }}
+              transition={{ duration: 0.25 }}
+            >
+              <Link href="" className="hover:text-gray-300">
+                {item}
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </motion.div>
     </motion.footer>
